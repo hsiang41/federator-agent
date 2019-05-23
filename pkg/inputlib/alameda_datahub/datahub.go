@@ -10,9 +10,14 @@ import (
 	"fmt"
 )
 
+type DatahubConfig struct {
+	DataHub *datahub.Config  `mapstructure:"datahub"`
+}
+
+
 type inputLib struct {
-	config  datahub.Config  `mapstructure:"datahub"`
-	scope   *logUtil.Scope
+	datahub     DatahubConfig
+	scope       *logUtil.Scope
 }
 
 func (i inputLib) Gather() error {
@@ -31,11 +36,11 @@ func (i inputLib) LoadConfig(config string, scope *logUtil.Scope) error {
 	if err != nil {
 		panic(errors.New("Read input library datahub configuration failed: " + err.Error()))
 	}
-	err = viper.Unmarshal(&i.config)
+	err = viper.Unmarshal(&i.datahub)
 	if err != nil {
 		panic(errors.New("Unmarshal input library datahub configuration failed: " + err.Error()))
 	} else {
-		if transmitterConfBin, err := json.MarshalIndent(i.config, "", "  "); err == nil {
+		if transmitterConfBin, err := json.MarshalIndent(i.datahub, "", "  "); err == nil {
 			scope.Infof(fmt.Sprintf("Input library datahub configuration: %s", string(transmitterConfBin)))
 		}
 	}

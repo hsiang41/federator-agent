@@ -2,7 +2,14 @@ log:
   set-logcallers: true
   output-level: "info" # debug, info, warn, error, fatal, none
 
-datahub:
-  address: "datahub.alameda.svc.cluster.local:50050"
-  retry-interval:
-    default: 3 # second
+input_jobs:
+- name: "datahub"
+  schedule-spec: "*/5 * * * * ?"
+  lib-path: "/root/goProject/src/github.com/containers-ai/federator-agent/lib/inputlib/datahub.so"
+  lib-configuration: "/root/goProject/src/github.com/containers-ai/federator-agent/etc/inputlib/datahub.yml"
+
+#output_jobs:
+#- name: "datahub"
+#  schedule-spec: "*/5 * * * * ?"
+#  lib-path: "lib/outputlib/datahub.so"
+#  lib-configuration: "etc/outputlib/datahub.conf"

@@ -1,4 +1,4 @@
-package main
+package outputlib
 
 import (
 	logUtil "github.com/containers-ai/alameda/pkg/utils/log"
@@ -16,5 +16,9 @@ func (o outputlib) LoadConfig(config string, scope *logUtil.Scope) error {
 	return nil
 }
 
-
 var OutputLib outputlib
+
+type OutputLibrary interface {
+	Write() error
+	LoadConfig(config string, scope *logUtil.Scope) error
+}

@@ -1,4 +1,4 @@
-package main
+package inputlib
 
 import (
 	logUtil "github.com/containers-ai/alameda/pkg/utils/log"
@@ -17,3 +17,8 @@ func (i inputLib) LoadConfig(config string, scope *logUtil.Scope) error {
 }
 
 var InputLib inputLib
+
+type InputLibrary interface {
+	Gather() error
+	LoadConfig(config string, scope *logUtil.Scope) error
+}

@@ -1,14 +1,21 @@
 package operator
 
 import (
-	"github.com/containers-ai/alameda/operator/datahub"
 	"github.com/containers-ai/alameda/pkg/utils/log"
 )
+
+type JobExecutor struct {
+	Name                string  `mapstructure:"name"`
+	ScheduledTaskSpec   string  `mapstructure:"schedule-spec"`
+	LibPath             string  `mapstructure:"lib-path"`
+	LibConfiguration    string  `mapstructure:"lib-configuration"`
+}
 
 // Config defines configurations
 type Config struct {
 	Log              *log.Config      `mapstructure:"log"`
-	Datahub          *datahub.Config  `mapstructure:"datahub"`
+	InputJobs        []JobExecutor    `mapstructure:"input_jobs"`
+	OutputJobs       []JobExecutor    `mapstructure:"output_jobs"`
 }
 
 // NewConfig returns Config objecdt
@@ -20,10 +27,8 @@ func NewConfig() Config {
 }
 
 func (c *Config) init() {
-
 	defaultLogConfig := log.NewDefaultConfig()
 	c.Log = &defaultLogConfig
-	c.Datahub = datahub.NewConfig()
 }
 
 func (c Config) Validate() error {
