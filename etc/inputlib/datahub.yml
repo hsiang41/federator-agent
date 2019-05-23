@@ -1,0 +1,4 @@
+datahub:
+  address: "datahub.alameda.svc.cluster.local:50050"
+  retry-interval:
+    default: 3 # second
