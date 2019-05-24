@@ -4,15 +4,16 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"strings"
+	"flag"
+	"plugin"
+	"os"
+	"github.com/spf13/viper"
+	"github.com/robfig/cron"
 	logUtil "github.com/containers-ai/alameda/pkg/utils/log"
 	Agent "github.com/containers-ai/federator-agent"
 	Lib "github.com/containers-ai/federator-agent/pkg/inputlib"
-	"github.com/spf13/viper"
-	"strings"
-	"flag"
-	"github.com/robfig/cron"
-	"plugin"
-	"os"
+	Queue "github.com/sheerun/queue"
 )
 
 const (
@@ -22,6 +23,7 @@ const (
 var transmitterConfigurationFile string
 var agentConfig Agent.Config
 var scope *logUtil.Scope
+var agentQueue *Queue.Queue
 
 type ScheduleJob struct {
 	libPath string
@@ -74,6 +76,10 @@ func initConfiguration() {
 			scope.Debug(fmt.Sprintf("Transmitter configuration: %s", string(transmitterConfBin)))
 		}
 	}
+}
+
+func initQueue() {
+	agentQueue = Queue.New()
 }
 
 func main() {

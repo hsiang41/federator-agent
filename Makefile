@@ -36,4 +36,4 @@ generate:
 
 # Build the docker image
 docker-build: test
-	docker build ./.. -t ${IMG} -f Dockerfile
+	docker build . -t ${IMG} -f Dockerfile

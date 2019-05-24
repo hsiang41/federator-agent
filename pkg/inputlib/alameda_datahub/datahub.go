@@ -8,6 +8,7 @@ import (
 	"strings"
 	"encoding/json"
 	"fmt"
+	"github.com/sheerun/queue"
 )
 
 type DatahubConfig struct {
@@ -18,6 +19,11 @@ type DatahubConfig struct {
 type inputLib struct {
 	datahub     DatahubConfig
 	scope       *logUtil.Scope
+	queue       *queue.Queue
+}
+
+func (i inputLib) SetAgentQueue(agentQueue *queue.Queue) {
+	i.queue = agentQueue
 }
 
 func (i inputLib) Gather() error {

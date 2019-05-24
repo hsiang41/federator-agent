@@ -2,11 +2,15 @@ log:
   set-logcallers: true
   output-level: "info" # debug, info, warn, error, fatal, none
 
-input_jobs:
-- name: "datahub"
-  schedule-spec: "*/5 * * * * ?"
-  lib-path: "/root/goProject/src/github.com/containers-ai/federator-agent/lib/inputlib/datahub.so"
-  lib-configuration: "/root/goProject/src/github.com/containers-ai/federator-agent/etc/inputlib/datahub.yml"
+#input_jobs:
+#- name: "datahub"
+#  schedule-spec: "*/5 * * * * ?"
+#  lib-path: "/root/goProject/src/github.com/containers-ai/federator-agent/lib/inputlib/datahub.so"
+#  lib-configuration: "/root/goProject/src/github.com/containers-ai/federator-agent/etc/inputlib/datahub.yml"
+#- name: "datahub1"
+#  schedule-spec: "*/5 * * * * ?"
+#  lib-path: "/root/goProject/src/github.com/containers-ai/federator-agent/lib/inputlib/datahub.so"
+#  lib-configuration: "/root/goProject/src/github.com/containers-ai/federator-agent/etc/inputlib/datahub.yml"
 
 #output_jobs:
 #- name: "datahub"

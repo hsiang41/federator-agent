@@ -2,6 +2,7 @@ package inputlib
 
 import (
 	logUtil "github.com/containers-ai/alameda/pkg/utils/log"
+	"github.com/sheerun/queue"
 )
 
 type inputLib struct {
@@ -21,4 +22,5 @@ var InputLib inputLib
 type InputLibrary interface {
 	Gather() error
 	LoadConfig(config string, scope *logUtil.Scope) error
+	SetAgentQueue(agentQueue *queue.Queue)
 }
