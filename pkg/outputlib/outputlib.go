@@ -6,7 +6,6 @@ import (
 )
 
 type outputlib struct {
-
 }
 
 func (o outputlib) Write() error {

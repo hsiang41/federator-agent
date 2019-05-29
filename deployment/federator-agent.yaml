@@ -1,0 +1,45 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: federator-agent-config
+  namespace: federator-agent
+data:
+  transmitter.yml: |-
+    log:
+      set-logcallers: true
+      output-level: "debug" # debug, info, warn, error, fatal, none
+
+    input_jobs:
+    - name: "datahub"
+      schedule-spec: "*/5 * * * * ?"
+      lib-path: "/lib/inputlib/datahub.so"
+      lib-configuration: "/etc/alameda/federator-agent/inputlib/datahub.yml"
+
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: federator-agent
+  namespace: federator-agent
+spec:
+  selector:
+    matchLabels:
+      app: federator-agent
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: federator-agent
+    spec:
+      containers:
+      - name: federator-agent
+        image: docker-registry.default.svc:5000/federator-agent/transmitter:latest
+        imagePullPolicy: Always
+        volumeMounts:
+          - name: federator-agent-config
+            mountPath: /etc/alameda/federator-agent/transmitter.yml
+            subPath: transmitter.yml
+      volumes:
+        - name: federator-agent-config
+          configMap:
+            name: federator-agent-config

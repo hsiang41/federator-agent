@@ -6,7 +6,6 @@ import (
 )
 
 type inputLib struct {
-
 }
 
 func (i inputLib) Gather() error {

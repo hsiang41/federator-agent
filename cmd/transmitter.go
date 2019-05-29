@@ -5,7 +5,6 @@ import (
 	"errors"
 	"fmt"
 	"strings"
-	"flag"
 	"plugin"
 	"os"
 	"github.com/spf13/viper"
@@ -14,6 +13,7 @@ import (
 	Agent "github.com/containers-ai/federator-agent"
 	Lib "github.com/containers-ai/federator-agent/pkg/inputlib"
 	Queue "github.com/sheerun/queue"
+	"flag"
 )
 
 const (
@@ -48,13 +48,14 @@ func (s ScheduleJob) Run() {
 		scope.Errorf(fmt.Sprintf("Failed to load library object: %v", err))
 		return
 	}
+
 	libObj.LoadConfig(s.configPath, scope)
 	libObj.Gather()
 }
 
 func init() {
-	// flag.StringVar(&transmitterConfigurationFile, "config", "/etc/alameda/federator-agent/transmitter.yml", "File path to transmitter configuration")
-	flag.StringVar(&transmitterConfigurationFile, "config", "/root/goProject/src/github.com/containers-ai/federator-agent/etc/transmitter.yml", "File path to transmitter configuration")
+	flag.StringVar(&transmitterConfigurationFile, "config", "/etc/alameda/federator-agent/transmitter.yml", "File path to transmitter configuration")
+	// flag.StringVar(&transmitterConfigurationFile, "config", "/root/goProject/src/github.com/containers-ai/federator-agent/etc/transmitter.yml", "File path to transmitter configuration")
 	scope = logUtil.RegisterScope("manager", "operator entry point", 0)
 }
 
