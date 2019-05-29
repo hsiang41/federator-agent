@@ -14,8 +14,18 @@ data:
       schedule-spec: "*/5 * * * * ?"
       lib-path: "/lib/inputlib/datahub.so"
       lib-configuration: "/etc/alameda/federator-agent/inputlib/datahub.yml"
+  datahub.yml: |
+    log:
+      set-logcallers: true
+      output-level: "debug" # debug, info, warn, error, fatal, none
 
+    input_jobs:
+    - name: "datahub"
+      schedule-spec: "*/5 * * * * ?"
+      lib-path: "/lib/inputlib/datahub.so"
+      lib-configuration: "/etc/alameda/federator-agent/inputlib/datahub.yml"
 ---
+
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
@@ -39,7 +49,15 @@ spec:
           - name: federator-agent-config
             mountPath: /etc/alameda/federator-agent/transmitter.yml
             subPath: transmitter.yml
+          - name: federator-agent-config
+            mountPath: /etc/alameda/federator-agent/input/datahub.yml
+            subPath: datahub.yml
       volumes:
         - name: federator-agent-config
           configMap:
             name: federator-agent-config
+          items:
+            - key: transmitter.yml
+              path: transmitter.yml
+            - key: datahub.yml
+              path: datahub.yml
