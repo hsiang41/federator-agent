@@ -16,7 +16,7 @@ import (
 
 	"github.com/containers-ai/api/datahub/resources"
 	"github.com/containers-ai/api/common"
-	Agent "github.com/containers-ai/federatorai-agent/pkg"
+	AgentCommon "github.com/containers-ai/federatorai-agent/pkg"
 )
 
 type DatapipeConfig struct {
@@ -136,7 +136,7 @@ func (i inputLib) Gather() error {
 		gDClient.scope.Error(fmt.Sprintf("Failed to get pods info, %v", err))
 	}
 
-	agentQ := Agent.AgentQueueItem{Agent.QueueTypePod, pods}
+	agentQ := &AgentCommon.AgentQueueItem{AgentCommon.QueueTypePod, pods}
 	if gDClient.queue != nil {
 		gDClient.queue.Append(agentQ)
 	}

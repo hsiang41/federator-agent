@@ -10,6 +10,6 @@ const (
 )
 
 type AgentQueueItem struct {
-	queueType QueueType
-	dataItem  interface{}
+	QueueType QueueType
+	DataItem  interface{}
 }
