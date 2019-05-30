@@ -1,4 +1,0 @@
-datahub:
-  address: "172.31.11.90:30050"
-  retry-interval:
-    default: 3 # second

@@ -1,0 +1,5 @@
+datapipe:
+  address: "172.31.11.90:30060"
+  retry-interval:
+    default: 3 # second
+

@@ -1,2 +1,2 @@
-# federator-agent
+# federatorai-agent
 Agent of Federator.ai cloud services

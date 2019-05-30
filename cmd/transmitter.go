@@ -3,17 +3,17 @@ package main
 import (
 	"encoding/json"
 	"errors"
-	"fmt"
-	"strings"
-	"plugin"
-	"os"
-	"github.com/spf13/viper"
-	"github.com/robfig/cron"
-	logUtil "github.com/containers-ai/alameda/pkg/utils/log"
-	Agent "github.com/containers-ai/federator-agent"
-	Lib "github.com/containers-ai/federator-agent/pkg/inputlib"
-	Queue "github.com/sheerun/queue"
 	"flag"
+	"fmt"
+	logUtil "github.com/containers-ai/alameda/pkg/utils/log"
+	Agent "github.com/containers-ai/federatorai-agent"
+	Lib "github.com/containers-ai/federatorai-agent/pkg/inputlib"
+	"github.com/robfig/cron"
+	Queue "github.com/sheerun/queue"
+	"github.com/spf13/viper"
+	"os"
+	"plugin"
+	"strings"
 )
 
 const (
@@ -26,7 +26,7 @@ var scope *logUtil.Scope
 var agentQueue *Queue.Queue
 
 type ScheduleJob struct {
-	libPath string
+	libPath    string
 	configPath string
 }
 
@@ -54,8 +54,8 @@ func (s ScheduleJob) Run() {
 }
 
 func init() {
-	flag.StringVar(&transmitterConfigurationFile, "config", "/etc/alameda/federator-agent/transmitter.yml", "File path to transmitter configuration")
-	// flag.StringVar(&transmitterConfigurationFile, "config", "/root/goProject/src/github.com/containers-ai/federator-agent/etc/transmitter.yml", "File path to transmitter configuration")
+	flag.StringVar(&transmitterConfigurationFile, "config", "/etc/alameda/federatorai-agent/transmitter.yml", "File path to transmitter configuration")
+	// flag.StringVar(&transmitterConfigurationFile, "config", "/root/goProject/src/github.com/containers-ai/federatorai-agent/etc/transmitter.yml", "File path to transmitter configuration")
 	scope = logUtil.RegisterScope("manager", "operator entry point", 0)
 }
 

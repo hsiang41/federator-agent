@@ -1,8 +1,8 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: federator-agent-config
-  namespace: federator-agent
+  name: federatorai-agent-config
+  namespace: federatorai-agent
 data:
   transmitter.yml: |-
     log:
@@ -12,9 +12,9 @@ data:
     input_jobs:
     - name: "datahub"
       schedule-spec: "*/5 * * * * ?"
-      lib-path: "/lib/inputlib/datahub.so"
-      lib-configuration: "/etc/alameda/federator-agent/inputlib/datahub.yml"
-  datahub.yml: |
+      lib-path: "/lib/inputlib/datapipe.so"
+      lib-configuration: "/etc/alameda/federatorai-agent/inputlib/datapipe.yml"
+  datapipe.yml: |
     log:
       set-logcallers: true
       output-level: "debug" # debug, info, warn, error, fatal, none
@@ -22,42 +22,42 @@ data:
     input_jobs:
     - name: "datahub"
       schedule-spec: "*/5 * * * * ?"
-      lib-path: "/lib/inputlib/datahub.so"
-      lib-configuration: "/etc/alameda/federator-agent/inputlib/datahub.yml"
+      lib-path: "/lib/inputlib/datapipe.so"
+      lib-configuration: "/etc/alameda/federatorai-agent/inputlib/datapipe.yml"
 ---
 
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
-  name: federator-agent
-  namespace: federator-agent
+  name: federatorai-agent
+  namespace: federatorai-agent
 spec:
   selector:
     matchLabels:
-      app: federator-agent
+      app: federatorai-agent
   replicas: 1
   template:
     metadata:
       labels:
-        app: federator-agent
+        app: federatorai-agent
     spec:
       containers:
-      - name: federator-agent
-        image: docker-registry.default.svc:5000/federator-agent/transmitter:latest
+      - name: federatorai-agent
+        image: docker-registry.default.svc:5000/federatorai-agent/transmitter:latest
         imagePullPolicy: Always
         volumeMounts:
-          - name: federator-agent-config
-            mountPath: /etc/alameda/federator-agent/transmitter.yml
+          - name: federatorai-agent-config
+            mountPath: /etc/alameda/federatorai-agent/transmitter.yml
             subPath: transmitter.yml
-          - name: federator-agent-config
-            mountPath: /etc/alameda/federator-agent/input/datahub.yml
-            subPath: datahub.yml
+          - name: federatorai-agent-config
+            mountPath: /etc/alameda/federatorai-agent/input/datapipe.yml
+            subPath: datapipe.yml
       volumes:
-        - name: federator-agent-config
+        - name: federatorai-agent-config
           configMap:
-            name: federator-agent-config
+            name: federatorai-agent-config
           items:
             - key: transmitter.yml
               path: transmitter.yml
-            - key: datahub.yml
-              path: datahub.yml
+            - key: datapipe.yml
+              path: datapipe.yml
