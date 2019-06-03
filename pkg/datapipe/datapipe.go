@@ -67,6 +67,8 @@ func (d *DataPipeClient) GetPods() (*dataPipeResources.ListPodsResponse, error) 
 		d.Scope.Error(fmt.Sprintf("Failed to list pods, %v", err))
 		return nil, err
 	}
+	fmt.Println(("get pods"))
+	fmt.Println("get pods:", rep)
 	d.Scope.Debug(fmt.Sprintf("get Pods status: %v", rep.Status.Code))
 	return rep, nil
 }

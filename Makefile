@@ -26,6 +26,11 @@ run: generate fmt vet
 fmt:
 	go fmt ./cmd/...
 
+# Run go build library
+lib:
+    go build -buildmode=plugin -a -o ./lib/inputlib/datapipe.so github.com/containers-ai/federatorai-agent/pkg/inputlib/alameda_datapipe
+    go build -buildmode=plugin -a -o ./lib/outputlib/datapipe_writer.so github.com/containers-ai/federatorai-agent/pkg/outputlib/alameda_datapipe
+
 # Run go vet against code
 vet:
 	go vet ./cmd/...
