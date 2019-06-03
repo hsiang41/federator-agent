@@ -15,15 +15,10 @@ data:
       lib-path: "/lib/inputlib/datapipe.so"
       lib-configuration: "/etc/alameda/federatorai-agent/inputlib/datapipe.yml"
   datapipe.yml: |
-    log:
-      set-logcallers: true
-      output-level: "debug" # debug, info, warn, error, fatal, none
-
-    input_jobs:
-    - name: "datahub"
-      schedule-spec: "*/5 * * * * ?"
-      lib-path: "/lib/inputlib/datapipe.so"
-      lib-configuration: "/etc/alameda/federatorai-agent/inputlib/datapipe.yml"
+    datapipe:
+      address: "localhost:50050"
+      retry-interval:
+        default: 3 # second
 ---
 
 apiVersion: extensions/v1beta1
