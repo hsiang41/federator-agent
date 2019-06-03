@@ -7,7 +7,6 @@ import (
 	"github.com/spf13/viper"
 	logUtil "github.com/containers-ai/alameda/pkg/utils/log"
 	"github.com/containers-ai/federatorai-agent/pkg/datapipe"
-	"fmt"
 )
 
 type inputLib struct {
