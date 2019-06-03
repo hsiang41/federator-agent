@@ -57,7 +57,7 @@ spec:
           configMap:
             name: federatorai-agent-config
           items:
-            - key: transmitter.yml
-              path: transmitter.yml
-            - key: datapipe.yml
-              path: datapipe.yml
+            - key: transmitter.yml
+              path: transmitter.yml
+            - key: datapipe.yml
+              path: datapipe.yml
