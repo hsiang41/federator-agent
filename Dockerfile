@@ -22,7 +22,7 @@ COPY --from=builder /go/src/github.com/containers-ai/federatorai-agent/etc/input
 #COPY --from=builder /go/src/github.com/containers-ai/federatorai-agent/etc/transmitter.yml /etc/alameda/federatorai-agent/transmitter.yml
 COPY --from=builder /go/src/github.com/containers-ai/federatorai-agent/transmitter/transmitter .
 COPY --from=builder /go/src/github.com/containers-ai/federatorai-agent/lib/inputlib/datapipe.so /lib/inputlib/datapipe.so
-COPY --from=builder /go/src/github.com/containers-ai/federatorai-agent/lib/outputlib/datapipe.so /lib/outputlib/datapipe_writer.so
+COPY --from=builder /go/src/github.com/containers-ai/federatorai-agent/lib/outputlib/datapipe_writer.so /lib/outputlib/datapipe_writer.so
 # EXPOSE 50050/tcp
 ENTRYPOINT ["./transmitter"]
 CMD [ "run" ]

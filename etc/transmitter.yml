@@ -3,7 +3,7 @@ log:
   output-level: "debug" # debug, info, warn, error, fatal, none
 
 input_jobs:
-- name: "datahub"
+- name: "datapipe_input"
   schedule-spec: "*/5 * * * * ?"
   lib-path: "/lib/inputlib/datapipe.so"
   lib-configuration: "/etc/alameda/federatorai-agent/inputlib/datapipe.yml"
@@ -14,8 +14,8 @@ input_jobs:
 #  lib-path: "/root/goProject/src/github.com/containers-ai/federatorai-agent/lib/inputlib/datapipe.so"
 #  lib-configuration: "/root/goProject/src/github.com/containers-ai/federatorai-agent/etc/inputlib/datapipe.yml"
 
-#output_jobs:
-#- name: "datahub"
-#  schedule-spec: "*/5 * * * * ?"
-#  lib-path: "lib/outputlib/datapipe.so"
-#  lib-configuration: "etc/outputlib/datapipe.conf"
+output_jobs:
+- name: "datapipe_output"
+  schedule-spec: "*/5 * * * * ?"
+  lib-path: "lib/outputlib/datapipe_writer.so"
+  lib-configuration: "/etc/alameda/federatorai-agent/outputlib/datapipe_writer.yml"

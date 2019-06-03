@@ -2,14 +2,11 @@ package main
 
 import (
 	"errors"
-	"fmt"
 	"strings"
 	"github.com/sheerun/queue"
 	"github.com/spf13/viper"
 	logUtil "github.com/containers-ai/alameda/pkg/utils/log"
-	AgentCommon "github.com/containers-ai/federatorai-agent/pkg"
 	"github.com/containers-ai/federatorai-agent/pkg/datapipe"
-	"time"
 )
 
 type inputLib struct {
@@ -22,18 +19,6 @@ func (i inputLib) SetAgentQueue(agentQueue *queue.Queue) {
 }
 
 func (i inputLib) Gather() error {
-	/*
-	pods, err := gDClient.GetPods()
-	if err != nil {
-		gDClient.scope.Error(fmt.Sprintf("Failed to get pods info, %v", err))
-	}
-	*/
-	qItem := fmt.Sprintf("%d gather", time.Now().Unix())
-
-	agentQ := &AgentCommon.AgentQueueItem{AgentCommon.QueueTypePod, qItem}
-	if gDClient.Queue != nil {
-		gDClient.Queue.Append(agentQ)
-	}
 	return nil
 }
 
@@ -65,3 +50,4 @@ func (i inputLib) LoadConfig(config string, scope *logUtil.Scope) error {
 }
 
 var InputLib inputLib
+
