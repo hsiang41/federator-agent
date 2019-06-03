@@ -2,7 +2,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: federatorai-agent-config
-  namespace: federatorai-agent
+  namespace: federatorai
 data:
   transmitter.yml: |-
     log:
@@ -30,7 +30,7 @@ apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
   name: federatorai-agent
-  namespace: federatorai-agent
+  namespace: federatorai
 spec:
   selector:
     matchLabels:
