@@ -17,9 +17,9 @@ FROM ubuntu:18.04
 # FROM busybox:latest
 
 WORKDIR /root/
-COPY --from=builder /go/src/github.com/containers-ai/federatorai-agent/etc/transmitter.yml /etc/alameda/federatorai-agent/transmitter.yml
-COPY --from=builder /go/src/github.com/containers-ai/federatorai-agent/etc/inputlib/datapipe.yml /etc/alameda/federatorai-agent/inputlib/datapipe.yml
-#COPY --from=builder /go/src/github.com/containers-ai/federatorai-agent/etc/transmitter.yml /etc/alameda/federatorai-agent/transmitter.yml
+COPY --from=builder /go/src/github.com/containers-ai/federatorai-agent/etc/transmitter.toml /etc/alameda/federatorai-agent/transmitter.toml
+COPY --from=builder /go/src/github.com/containers-ai/federatorai-agent/etc/inputlib/datapipe.toml /etc/alameda/federatorai-agent/inputlib/datapipe.toml
+#COPY --from=builder /go/src/github.com/containers-ai/federatorai-agent/etc/transmitter.toml /etc/alameda/federatorai-agent/transmitter.toml
 COPY --from=builder /go/src/github.com/containers-ai/federatorai-agent/transmitter/transmitter .
 COPY --from=builder /go/src/github.com/containers-ai/federatorai-agent/lib/inputlib/datapipe.so /lib/inputlib/datapipe.so
 COPY --from=builder /go/src/github.com/containers-ai/federatorai-agent/lib/outputlib/datapipe_writer.so /lib/outputlib/datapipe_writer.so

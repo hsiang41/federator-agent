@@ -1,6 +1,8 @@
 package main
 
 import (
+	"encoding/json"
+	"fmt"
 	"errors"
 	"strings"
 	"github.com/sheerun/queue"
@@ -53,13 +55,10 @@ func (i inputLib) LoadConfig(config string, scope *logUtil.Scope) error {
 	if err != nil {
 		panic(errors.New("Unmarshal input library datahub configuration failed: " + err.Error()))
 	} else {
-		/*
-		if transmitterConfBin, err := json.MarshalIndent(gDClient.datapipe, "", "  "); err == nil {
-			gDClient.scope.Infof(fmt.Sprintf("Input library datahub configuration: %s", string(transmitterConfBin)))
+		if transmitterConfBin, err := json.MarshalIndent(gDClient.DataPipe, "", "  "); err == nil {
+			gDClient.Scope.Infof(fmt.Sprintf("Input library datahub configuration: %s", string(transmitterConfBin)))
 		}
-		*/
 	}
-
 	return nil
 }
 

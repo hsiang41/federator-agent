@@ -17,7 +17,10 @@ import (
 )
 
 type DatapipeConfig struct {
-	DataPipe *datahub.Config  `mapstructure:"datapipe"`
+	DataPipe            *datahub.Config  `mapstructure:"datapipe"`
+	DataGranularitySec	int              `mapstructure:"data_granularity_sec"`
+	DataAmountInitSec   int              `mapstructure:"data_amount_init_sec"`
+	DataAmountSec       int              `mapstructure:"data_amount_sec"`
 }
 
 type DataPipeClient struct {

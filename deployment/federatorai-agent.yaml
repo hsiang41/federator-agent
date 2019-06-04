@@ -4,21 +4,27 @@ metadata:
   name: federatorai-agent-config
   namespace: federatorai
 data:
-  transmitter.yml: |-
-    log:
-      set-logcallers: true
-      output-level: "debug" # debug, info, warn, error, fatal, none
+  transmitter.toml: |-
+    [log]
+     set-logcallers = true
+     output-level = "debug" # debug, info, warn, error, fatal, none
 
-    input_jobs:
-    - name: "datahub"
-      schedule-spec: "*/5 * * * * ?"
-      lib-path: "/lib/inputlib/datapipe.so"
-      lib-configuration: "/etc/alameda/federatorai-agent/inputlib/datapipe.yml"
-  datapipe.yml: |
-    datapipe:
-      address: "localhost:50050"
-      retry-interval:
-        default: 3 # second
+    [input_jobs]
+        [input_jobs.datapipe_input]
+        name = "datapipe_input"
+        schedule-spec = "*/5 * * * * ?"
+        lib-path = "/lib/inputlib/datapipe.so"
+        lib-configuration = "/etc/alameda/federatorai-agent/inputlib/datapipe.toml"
+  datapipe.toml: |
+    data_granularity_sec = 30
+    data_amount_init_sec = 300
+    data_amount_sec = 3600
+
+    [datapipe]
+    address = "127.0.0.1:50060"
+
+    [datapipe."retry-interval"]
+    default = 3
 ---
 
 apiVersion: extensions/v1beta1
@@ -42,17 +48,17 @@ spec:
         imagePullPolicy: Always
         volumeMounts:
           - name: federatorai-agent-config
-            mountPath: /etc/alameda/federatorai-agent/transmitter.yml
-            subPath: transmitter.yml
+            mountPath: /etc/alameda/federatorai-agent/transmitter.toml
+            subPath: transmitter.toml
           - name: federatorai-agent-config
-            mountPath: /etc/alameda/federatorai-agent/input/datapipe.yml
-            subPath: datapipe.yml
+            mountPath: /etc/alameda/federatorai-agent/input/datapipe.toml
+            subPath: datapipe.toml
       volumes:
         - name: federatorai-agent-config
           configMap:
             name: federatorai-agent-config
           items:
-            - key: transmitter.yml
-              path: transmitter.yml
-            - key: datapipe.yml
-              path: datapipe.yml
+            - key: transmitter.toml
+              path: transmitter.toml
+            - key: datapipe.toml
+              path: datapipe.toml

@@ -14,8 +14,8 @@ type JobExecutor struct {
 // Config defines configurations
 type Config struct {
 	Log              *log.Config      `mapstructure:"log"`
-	InputJobs        []JobExecutor    `mapstructure:"input_jobs"`
-	OutputJobs       []JobExecutor    `mapstructure:"output_jobs"`
+	InputJobs        map[string]JobExecutor    `mapstructure:"input_jobs"`
+	OutputJobs       map[string]JobExecutor    `mapstructure:"output_jobs"`
 }
 
 // NewConfig returns Config objecdt

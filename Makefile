@@ -1,18 +1,18 @@
 
 # Image URL to use all building/pushing image targets
-IMG ?= transmitter:latest
+IMG ?= federatorai-agent:latest
 
 .PHONY: all test transmitter
-all: test transmitter
+all: test federatorai-agent
 
 # Run tests
 test: generate fmt vet
 	go test ./cmd/... -coverprofile cover.out
 
 # Build transmitter binary
-transmitter: generate fmt vet
-	# go build -ldflags "-X main.VERSION=`git rev-parse --abbrev-ref HEAD`-`git rev-parse --short HEAD``git diff --quiet || echo '-dirty'` -X 'main.BUILD_TIME=`date`' -X 'main.GO_VERSION=`go version`'" -o transmitter/transmitter github.com/containers-ai/alameda-transmitter/cmd
-	go build -o transmitter/transmitter github.com/containers-ai/alameda-transmitter/cmd
+federatorai-agent: generate fmt vet
+	# go build -ldflags "-X main.VERSION=`git rev-parse --abbrev-ref HEAD`-`git rev-parse --short HEAD``git diff --quiet || echo '-dirty'` -X 'main.BUILD_TIME=`date`' -X 'main.GO_VERSION=`go version`'" -o transmitter/transmitter github.com/containers-ai/federatorai-agent/cmd
+	go build -o transmitter/transmitter github.com/containers-ai/federatorai-agent/cmd
 
 .PHONY: run
 
