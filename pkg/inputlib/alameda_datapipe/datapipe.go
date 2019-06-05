@@ -9,6 +9,7 @@ import (
 	"github.com/spf13/viper"
 	logUtil "github.com/containers-ai/alameda/pkg/utils/log"
 	"github.com/containers-ai/federatorai-agent/pkg/datapipe"
+	"github.com/containers-ai/federatorai-agent/pkg/utils"
 )
 
 type inputLib struct {
@@ -21,20 +22,63 @@ func (i inputLib) SetAgentQueue(agentQueue *queue.Queue) {
 }
 
 func (i inputLib) Gather() error {
-	/*
-	_, err := gDClient.GetPods()
+
+	// For Pods metrics
+	lsPodResp, err := gDClient.GetPods()
 	if err != nil {
 		gDClient.Scope.Error(fmt.Sprintf("Failed to get pods info, %v", err))
 	}
-	*/
-	/*
-	qItem := fmt.Sprintf("%d gather", time.Now().Unix())
 
-	agentQ := &AgentCommon.AgentQueueItem{AgentCommon.QueueTypePod, qItem}
-	if gDClient.Queue != nil {
-		gDClient.Queue.Append(agentQ)
+	if lsPodResp != nil {
+		for _, v := range lsPodResp.Pods {
+			tr := utils.GetTimeRange(nil, nil, gDClient.DataPipe.DataAmountSec, true, gDClient.DataPipe.DataGranularitySec)
+			namespace := gDClient.ConvertPodNamespace(v)
+			podMetrics, err := gDClient.GetPodMetrics(namespace, tr)
+			if err != nil {
+				gDClient.Scope.Error(fmt.Sprintf("Failed to get pod metrics, %v", err))
+				continue
+			}
+			podM := podMetrics.GetPodMetrics()
+			if podM != nil {
+				err := gDClient.CreatePodMetrics(podM)
+				if err != nil {
+					gDClient.Scope.Errorf(fmt.Sprintf("Failed to create pods metrics, %v", err))
+				} else {
+					gDClient.Scope.Debugf(fmt.Sprintf("Succeed to create pod metrics"))
+				}
+
+			}
+		}
 	}
-	*/
+
+	// For nodes metrics
+	lsNodeResp, err := gDClient.GetNodes()
+	if err != nil {
+		gDClient.Scope.Error(fmt.Sprintf("Failed to get nodes info, %v", err))
+	}
+
+	if lsNodeResp != nil {
+		var nodesName [] string
+		for _, v := range lsNodeResp.Nodes {
+			nodesName = append(nodesName, v.GetName())
+		}
+		if len(nodesName) > 0 {
+			tr := utils.GetTimeRange(nil, nil, gDClient.DataPipe.DataAmountSec, true, gDClient.DataPipe.DataGranularitySec)
+			nodeMetrics, err := gDClient.GetNodeMetrics(nodesName, tr)
+			if err != nil {
+				gDClient.Scope.Error(fmt.Sprintf("Failed to get nodes metrics, %v", err))
+			}
+			if nodeMetrics != nil {
+				err := gDClient.CreateNodeMetrics(nodeMetrics.GetNodeMetrics())
+				if err != nil {
+					gDClient.Scope.Errorf(fmt.Sprintf("Failed to create nodes metrics, %v", err))
+				} else {
+					gDClient.Scope.Debugf(fmt.Sprintf("Succeed to create nodes metrics"))
+				}
+			}
+		}
+	}
+	
 	return nil
 }
 
@@ -56,7 +100,7 @@ func (i inputLib) LoadConfig(config string, scope *logUtil.Scope) error {
 		panic(errors.New("Unmarshal input library datahub configuration failed: " + err.Error()))
 	} else {
 		if transmitterConfBin, err := json.MarshalIndent(gDClient.DataPipe, "", "  "); err == nil {
-			gDClient.Scope.Infof(fmt.Sprintf("Input library datahub configuration: %s", string(transmitterConfBin)))
+			gDClient.Scope.Debugf(fmt.Sprintf("Input library datahub configuration: %s", string(transmitterConfBin)))
 		}
 	}
 	return nil

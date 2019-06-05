@@ -14,13 +14,14 @@ import (
 	"github.com/containers-ai/api/datahub/metrics"
 	"github.com/containers-ai/api/common"
 	"fmt"
+	datahub_v1a1pha1 "github.com/containers-ai/api/alameda_api/v1alpha1/datahub"
 )
 
 type DatapipeConfig struct {
 	DataPipe            *datahub.Config  `mapstructure:"datapipe"`
-	DataGranularitySec	int              `mapstructure:"data_granularity_sec"`
-	DataAmountInitSec   int              `mapstructure:"data_amount_init_sec"`
-	DataAmountSec       int              `mapstructure:"data_amount_sec"`
+	DataGranularitySec	int32            `mapstructure:"data_granularity_sec"`
+	DataAmountInitSec   int32            `mapstructure:"data_amount_init_sec"`
+	DataAmountSec       int32            `mapstructure:"data_amount_sec"`
 }
 
 type DataPipeClient struct {
@@ -33,18 +34,18 @@ func NewDataPipeClient() *DataPipeClient {
 	return &DataPipeClient{}
 }
 
-func (d *DataPipeClient) GetNodes() (*dataPipeResources.ListNodesResponse, error) {
+func (d *DataPipeClient) GetNodes() (*datahub_v1a1pha1.ListNodesResponse, error) {
 	conn, err := grpc.Dial(d.DataPipe.DataPipe.Address, grpc.WithInsecure())
 	if err != nil {
 		d.Scope.Error(fmt.Sprintf("Failed to connect datapipe %s, %v", d.DataPipe.DataPipe.Address, err))
 		return nil, err
 	}
 	defer conn.Close()
-	datapipeClient := dataPipeResources.NewResourcesServiceClient(conn)
+	datapipeClient := datahub_v1a1pha1.NewDatahubServiceClient(conn)
 
-	req := dataPipeResources.ListNodesRequest{}
+	req := datahub_v1a1pha1.ListAlamedaNodesRequest{}
 
-	rep, err := datapipeClient.ListNodes(context.Background(), &req)
+	rep, err := datapipeClient.ListAlamedaNodes(context.Background(), &req)
 	if err != nil {
 		d.Scope.Error(fmt.Sprintf("Failed to list nodes, %v", err))
 		return nil, err
@@ -54,24 +55,22 @@ func (d *DataPipeClient) GetNodes() (*dataPipeResources.ListNodesResponse, error
 	return rep, nil
 }
 
-func (d *DataPipeClient) GetPods() (*dataPipeResources.ListPodsResponse, error) {
+func (d *DataPipeClient) GetPods() (*datahub_v1a1pha1.ListPodsResponse, error) {
 	conn, err := grpc.Dial(d.DataPipe.DataPipe.Address, grpc.WithInsecure())
 	if err != nil {
 		d.Scope.Error(fmt.Sprintf("Failed to connect datapipe %s, %v", d.DataPipe.DataPipe.Address, err))
 		return nil, err
 	}
 	defer conn.Close()
-	datapipeClient := dataPipeResources.NewResourcesServiceClient(conn)
+	datapipeClient := datahub_v1a1pha1.NewDatahubServiceClient(conn)
 
-	req := dataPipeResources.ListPodsRequest{}
+	req := datahub_v1a1pha1.ListAlamedaPodsRequest{}
 
-	rep, err := datapipeClient.ListPods(context.Background(), &req)
+	rep, err := datapipeClient.ListAlamedaPods(context.Background(), &req)
 	if err != nil {
 		d.Scope.Error(fmt.Sprintf("Failed to list pods, %v", err))
 		return nil, err
 	}
-	fmt.Println(("get pods"))
-	fmt.Println("get pods:", rep)
 	d.Scope.Debug(fmt.Sprintf("get Pods status: %v", rep.Status.Code))
 	return rep, nil
 }
@@ -277,4 +276,17 @@ func (d *DataPipeClient) ListPodRecommendations(namespaces *resources.Namespaced
 	}
 	d.Scope.Debug(fmt.Sprintf("List pods recommendations status: %v", rep))
 	return rep, nil
+}
+
+func (d *DataPipeClient) ConvertPodNamespace(pod *datahub_v1a1pha1.Pod) (*resources.NamespacedName) {
+	if pod == nil {
+		return &resources.NamespacedName{}
+	}
+	return &resources.NamespacedName{
+		pod.NamespacedName.Namespace,
+		pod.NamespacedName.Name,
+		pod.NamespacedName.XXX_NoUnkeyedLiteral,
+		pod.NamespacedName.XXX_unrecognized,
+		pod.NamespacedName.XXX_sizecache,
+	}
 }

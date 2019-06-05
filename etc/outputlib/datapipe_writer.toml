@@ -1,5 +1,10 @@
-datapipe:
-  address: "172.31.11.90:30060"
-  retry-interval:
-    default: 3 # second
+data_granularity_sec = 30
+data_amount_init_sec = 300
+data_amount_sec = 3600
+
+[datapipe]
+address = "127.0.0.1:50060"
+
+[datapipe."retry-interval"]
+default = 3 # second
 

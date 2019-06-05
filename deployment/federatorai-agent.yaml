@@ -14,7 +14,7 @@ data:
         name = "datapipe_input"
         schedule-spec = "*/5 * * * * ?"
         lib-path = "/lib/inputlib/datapipe.so"
-        lib-configuration = "/etc/alameda/federatorai-agent/inputlib/datapipe.toml"
+        lib-configuration = "/etc/alameda/federatorai-agent/input/datapipe.toml"
   datapipe.toml: |
     data_granularity_sec = 30
     data_amount_init_sec = 300

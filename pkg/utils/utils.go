@@ -10,8 +10,8 @@ import (
 )
 
 func GetTimeRange(startTime *timestamp.Timestamp, endTime *timestamp.Timestamp, durationTime int32, isInit bool, initGronularitySec int32) *CommonLib.TimeRange {
-	if startTime == nil && endTime == nil {
-		panic("Invalid parameters of GetTimeRange")
+	if startTime == nil {
+		startTime = ptypes.TimestampNow()
 	}
 
 	if durationTime == 0 {

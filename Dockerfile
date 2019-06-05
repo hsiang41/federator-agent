@@ -8,7 +8,7 @@ ADD . .
 RUN ["/bin/bash", "-c", "GOOS=linux GOARCH=amd64 go build -ldflags \"-X main.VERSION=`git rev-parse --abbrev-ref HEAD`-`git rev-parse --short HEAD``git diff --quiet || echo '-dirty'` -X 'main.BUILD_TIME=`date`' -X 'main.GO_VERSION=`go version`'\" -a -o ./transmitter/transmitter github.com/containers-ai/federatorai-agent/cmd"]
 # RUN ["/bin/bash", "-c", "CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -ldflags \"-X main.VERSION=`git rev-parse --abbrev-ref HEAD`-`git rev-parse --short HEAD``git diff --quiet || echo '-dirty'` -X 'main.BUILD_TIME=`date`' -X 'main.GO_VERSION=`go version`'\" -buildmode=plugin -a -o ./lib/inputlib/datahub.so github.com/containers-ai/federatorai-agent/pkg/inputlib/alameda_datapipe/datapipe.go"]
 RUN ["/bin/bash", "-c", "CGO_ENABLED=1 GOOS=linux GOARCH=amd64 go build -buildmode=plugin -a -o ./lib/inputlib/datapipe.so github.com/containers-ai/federatorai-agent/pkg/inputlib/alameda_datapipe"]
-RUN ["/bin/bash", "-c", "CGO_ENABLED=1 GOOS=linux GOARCH=amd64 go build -buildmode=plugin -a -o ./lib/outputlib/datapipe_writer.so github.com/containers-ai/federatorai-agent/pkg/outputlib/alameda_datapipe"]
+# RUN ["/bin/bash", "-c", "CGO_ENABLED=1 GOOS=linux GOARCH=amd64 go build -buildmode=plugin -a -o ./lib/outputlib/datapipe_writer.so github.com/containers-ai/federatorai-agent/pkg/outputlib/alameda_recommender"]
 
 
 # Copy the controller-manager into a thin image

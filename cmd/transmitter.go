@@ -87,7 +87,7 @@ func (s ScheduleJob) Run() {
 func init() {
 	flag.StringVar(&transmitterConfigurationFile, "config", "/etc/alameda/federatorai-agent/transmitter.toml", "File path to transmitter configuration")
 	// flag.StringVar(&transmitterConfigurationFile, "config", "/root/goProject/src/github.com/containers-ai/federatorai-agent/etc/transmitter.toml", "File path to transmitter configuration")
-	scope = logUtil.RegisterScope("manager", "operator entry point", 0)
+	scope = logUtil.RegisterScope("federatorai-agent", "operator entry point", 0)
 }
 
 func initConfiguration() {
