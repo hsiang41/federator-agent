@@ -15,8 +15,9 @@
 #  lib-path: "/root/goProject/src/github.com/containers-ai/federatorai-agent/lib/inputlib/datapipe.so"
 #  lib-configuration: "/root/goProject/src/github.com/containers-ai/federatorai-agent/etc/inputlib/datapipe.toml"
 
-#output_jobs:
-#- name: "datapipe_output"
-#  schedule-spec: "*/5 * * * * ?"
-#  lib-path: "lib/outputlib/datapipe_writer.so"
-#  lib-configuration: "/etc/alameda/federatorai-agent/outputlib/datapipe_writer.toml"
+[output_jobs]
+    [output_jobs.datapipe_output]
+    name = "datapipe_output"
+    schedule-spec = "*/30 * * * * ?"
+    lib-path = "lib/outputlib/datapipe_recommender.so"
+    lib-configuration = "/etc/alameda/federatorai-agent/outputlib/datapipe.toml"

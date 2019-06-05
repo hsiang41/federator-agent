@@ -45,15 +45,7 @@ func (i outputlib) Write() error {
 			}
 			podRC := podRecommendations.PodRecommendations
 			if podRC != nil {
-				status, err := crWriter.CreatePodRecommendations(context.Background(), podRC)
-				if err != nil {
-					gDClient.Scope.Errorf(fmt.Sprintf("Failed to create pods metrics, %v", err))
-				}
-				if status.Code != 0 {
-					gDClient.Scope.Errorf(fmt.Sprintf("Failed to create %s pods recommendation(%d): %s", namespace, status.Code, status.GetMessage()))
-				} else {
-					gDClient.Scope.Debugf(fmt.Sprintf("Succeed to create %s pods recommendation", namespace))
-				}
+				crWriter.CreatePodRecommendations(context.Background(), podRC)
 			}
 		}
 	}

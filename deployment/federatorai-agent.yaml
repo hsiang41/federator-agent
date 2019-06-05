@@ -15,13 +15,21 @@ data:
         schedule-spec = "*/5 * * * * ?"
         lib-path = "/lib/inputlib/datapipe.so"
         lib-configuration = "/etc/alameda/federatorai-agent/input/datapipe.toml"
+
+    [output_jobs]
+        [output_jobs.datapipe_output]
+        name = "datapipe_output"
+        schedule-spec = "*/30 * * * * ?"
+        lib-path = "lib/outputlib/datapipe_recommender.so"
+        lib-configuration = "/etc/alameda/federatorai-agent/outputlib/datapipe.toml"
+
   datapipe.toml: |
     data_granularity_sec = 30
     data_amount_init_sec = 300
     data_amount_sec = 3600
 
     [datapipe]
-    address = "127.0.0.1:50060"
+    address = "alameda-datapipe.federatorai.svc:50060"
 
     [datapipe."retry-interval"]
     default = 3
@@ -52,6 +60,9 @@ spec:
             subPath: transmitter.toml
           - name: federatorai-agent-config
             mountPath: /etc/alameda/federatorai-agent/input/datapipe.toml
+            subPath: datapipe.toml
+          - name: federatorai-agent-config
+            mountPath: /etc/alameda/federatorai-agent/output/datapipe.toml
             subPath: datapipe.toml
       volumes:
         - name: federatorai-agent-config
