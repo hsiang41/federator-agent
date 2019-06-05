@@ -93,7 +93,7 @@ func (d *DataPipeClient) GetNodeMetrics(nodeNames []string, timeRange *common.Ti
 
 	rep, err := datapipeClient.ListNodeMetrics(context.Background(), &req)
 	if rep.Status.Code != 0 {
-		d.Scope.Errorf(fmt.Sprintf("Failed to list node metrics(%d): %s", rep.Status.Code, rep.Status.Message))
+		d.Scope.Errorf(fmt.Sprintf("Failed to list %v node metrics(%d): %s", nodeNames, rep.Status.Code, rep.Status.Message))
 		return rep, err
 	}
 	d.Scope.Debugf(fmt.Sprintf("Succeed to list node metrics: %v", rep))
@@ -119,14 +119,14 @@ func (d *DataPipeClient) GetPodMetrics(namespaces *resources.NamespacedName, tim
 
 	rep, err := datapipeClient.ListPodMetrics(context.Background(), &req)
 	if err != nil {
-		d.Scope.Errorf(fmt.Sprintf("Failed to list pod metrics, %v", err))
+		d.Scope.Errorf(fmt.Sprintf("Failed to list %s pods metrics, %v",, namespaces.Namespace, err))
 		return nil, err
 	}
 	if rep.Status.Code != 0 {
-		d.Scope.Errorf(fmt.Sprintf("Failed to list pod metrics(%d): %s", rep.Status.Code, rep.Status.Message))
+		d.Scope.Errorf(fmt.Sprintf("Failed to list %s pods metrics(%d): %s", namespaces.Namespace, rep.Status.Code, rep.Status.Message))
 		return rep, err
 	}
-	d.Scope.Debugf(fmt.Sprintf("Succeed to list pod metrics: %v", rep))
+	d.Scope.Debugf(fmt.Sprintf("Succeed to list pods metrics: %v", rep))
 	return rep, nil
 }
 
