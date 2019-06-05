@@ -21,12 +21,12 @@ binaries:
 	CGO_ENABLED=1 GOOS=linux GOARCH=amd64 go build -buildmode=plugin -a -o ./lib/outputlib/datapipe_recommender.so github.com/containers-ai/federatorai-agent/pkg/outputlib/alameda_recommender
 
 install_dir:
-	mkdir -pv /etc/alameda/federatorai-agent /etc/alameda/federatorai-agent/inputlib /lib/inputlib /lib/outputlib /root/
+	mkdir -pv /etc/alameda/federatorai-agent /etc/alameda/federatorai-agent/input /etc/alameda/federatorai-agent/output /lib/inputlib /lib/outputlib /root/
 
 install: install_dir
 	cp -fv /go/src/github.com/containers-ai/federatorai-agent/etc/transmitter.toml /etc/alameda/federatorai-agent/transmitter.toml
-	cp -fv /go/src/github.com/containers-ai/federatorai-agent/etc/inputlib/datapipe.toml /etc/alameda/federatorai-agent/inputlib/datapipe.toml
-	cp -fv /go/src/github.com/containers-ai/federatorai-agent/etc/inputlib/datapipe.toml /etc/alameda/federatorai-agent/outputlib/datapipe.toml
+	cp -fv /go/src/github.com/containers-ai/federatorai-agent/etc/input/datapipe.toml /etc/alameda/federatorai-agent/input/datapipe.toml
+	cp -fv /go/src/github.com/containers-ai/federatorai-agent/etc/input/datapipe.toml /etc/alameda/federatorai-agent/output/datapipe.toml
 	cp -fv /go/src/github.com/containers-ai/federatorai-agent/transmitter/transmitter /root/
 	cp -fv /go/src/github.com/containers-ai/federatorai-agent/lib/inputlib/datapipe.so /lib/inputlib/datapipe.so
 	cp -fv /go/src/github.com/containers-ai/federatorai-agent/lib/outputlib/datapipe_recommender.so /lib/outputlib/datapipe_recommender.so
