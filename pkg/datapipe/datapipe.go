@@ -119,7 +119,7 @@ func (d *DataPipeClient) GetPodMetrics(namespaces *resources.NamespacedName, tim
 
 	rep, err := datapipeClient.ListPodMetrics(context.Background(), &req)
 	if err != nil {
-		d.Scope.Errorf(fmt.Sprintf("Failed to list %s pods metrics, %v",, namespaces.Namespace, err))
+		d.Scope.Errorf(fmt.Sprintf("Failed to list %s pods metrics, %v", namespaces.Namespace, err))
 		return nil, err
 	}
 	if rep.Status.Code != 0 {

@@ -11,6 +11,7 @@ import (
 	"github.com/containers-ai/federatorai-agent/pkg/datapipe"
 	"github.com/containers-ai/federatorai-agent/pkg/utils"
 	rcWriter "github.com/containers-ai/federatorai-agent/pkg/crwriter"
+	"context"
 )
 
 type outputlib struct {
@@ -23,7 +24,10 @@ func (i outputlib) SetAgentQueue(agentQueue *queue.Queue) {
 }
 
 func (i outputlib) Write() error {
-	crWriter := rcWriter.NewCrWriter(gDClient.Scope)
+	crWriter, err := rcWriter.NewCrWriter(gDClient.Scope)
+	if err != nil {
+		gDClient.Scope.Errorf(fmt.Sprintf("Failed to new cr writer object: %v", err))
+	}
 	// List pod recommendation
 	lsPodResp, err := gDClient.GetPods()
 	if err != nil {
@@ -41,12 +45,16 @@ func (i outputlib) Write() error {
 			}
 			podRC := podRecommendations.PodRecommendations
 			if podRC != nil {
-				err := rcWriter.
+				status, err := crWriter.CreatePodRecommendations(context.Background(), podRC)
 				if err != nil {
-					gDClient.Scope.Error(fmt.Sprintf("Failed to create pods metrics, %v", err))
+					gDClient.Scope.Errorf(fmt.Sprintf("Failed to create pods metrics, %v", err))
+				}
+				if status.Code != 0 {
+					gDClient.Scope.Errorf(fmt.Sprintf("Failed to create %s pods recommendation(%d): %s", namespace, status.Code, status.GetMessage()))
+				} else {
+					gDClient.Scope.Debugf(fmt.Sprintf("Succeed to create %s pods recommendation", namespace))
 				}
 			}
-			fmt.Println("List metrics:", podMetrics)
 		}
 	}
 

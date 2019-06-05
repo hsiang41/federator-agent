@@ -7,11 +7,11 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client/config"
 	"google.golang.org/genproto/googleapis/rpc/status"
 	K8SErrors                               "k8s.io/apimachinery/pkg/api/errors"
-	DatahubV1Alpha1                         "github.com/containers-ai/api/alameda_api/v1alpha1/datahub"
 	logUtil                                 "github.com/containers-ai/alameda/pkg/utils/log"
 	OperatorAPIsAutoScalingV1Alpha1         "github.com/containers-ai/alameda/operator/pkg/apis/autoscaling/v1alpha1"
 	OperatorReconcilerAlamedaRecommendation "github.com/containers-ai/alameda/operator/pkg/reconciler/alamedarecommendation"
 	"k8s.io/apimachinery/pkg/types"
+	"github.com/containers-ai/api/datahub/recommendations"
 )
 
 type CrWriter struct {
@@ -37,9 +37,8 @@ func NewCrWriter(scope *logUtil.Scope) (*CrWriter, error) {
 	return &CrWriter{k8sCli, scope}, nil
 }
 
-func (c *CrWriter) CreatePodRecommendations(ctx context.Context, in *DatahubV1Alpha1.CreatePodRecommendationsRequest) (*status.Status, error) {
-	podRecommendations := in.GetPodRecommendations()
-	for _, podRecommendation := range podRecommendations {
+func (c *CrWriter) CreatePodRecommendations(ctx context.Context, in []*recommendations.PodRecommendation) (*status.Status, error) {
+	for _, podRecommendation := range in {
 		podNS := podRecommendation.GetNamespacedName().Namespace
 		podName := podRecommendation.GetNamespacedName().Name
 		alamedaRecommendation := &OperatorAPIsAutoScalingV1Alpha1.AlamedaRecommendation{}
