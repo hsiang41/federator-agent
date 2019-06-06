@@ -21,7 +21,7 @@ data:
         name = "datapipe_output"
         schedule-spec = "*/30 * * * * ?"
         lib-path = "lib/outputlib/datapipe_recommender.so"
-        lib-configuration = "/etc/alameda/federatorai-agent/outputlib/datapipe.toml"
+        lib-configuration = "/etc/alameda/federatorai-agent/output/datapipe.toml"
 
   datapipe.toml: |
     data_granularity_sec = 30

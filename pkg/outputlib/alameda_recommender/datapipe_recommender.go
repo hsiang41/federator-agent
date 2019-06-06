@@ -9,9 +9,10 @@ import (
 	"github.com/sheerun/queue"
 	logUtil "github.com/containers-ai/alameda/pkg/utils/log"
 	"github.com/containers-ai/federatorai-agent/pkg/datapipe"
-	"github.com/containers-ai/federatorai-agent/pkg/utils"
 	rcWriter "github.com/containers-ai/federatorai-agent/pkg/crwriter"
 	"context"
+	"google.golang.org/grpc/status"
+	"google.golang.org/grpc/codes"
 )
 
 type outputlib struct {
@@ -24,6 +25,7 @@ func (i outputlib) SetAgentQueue(agentQueue *queue.Queue) {
 }
 
 func (i outputlib) Write() error {
+	gDClient.Scope.Debugf(fmt.Sprintf("output library - Write"))
 	crWriter, err := rcWriter.NewCrWriter(gDClient.Scope)
 	if err != nil {
 		gDClient.Scope.Errorf(fmt.Sprintf("Failed to new cr writer object: %v", err))
@@ -31,21 +33,37 @@ func (i outputlib) Write() error {
 	// List pod recommendation
 	lsPodResp, err := gDClient.GetPods()
 	if err != nil {
-		gDClient.Scope.Error(fmt.Sprintf("Failed to get pods info, %v", err))
+		gDClient.Scope.Error(fmt.Sprintf("Failed to get pods list, %v", err))
+		return err
+	}
+
+	if lsPodResp.Status.Code != 0 {
+		gDClient.Scope.Errorf(fmt.Sprintf("Failed to get pods list(%d), %v", lsPodResp.Status.Code, lsPodResp.Status.GetMessage()))
+		return status.Errorf(codes.NotFound, fmt.Sprintf("Failed to get pods list(%d), %v", lsPodResp.Status.Code, lsPodResp.Status.GetMessage()))
 	}
 
 	if lsPodResp != nil {
 		for _, v := range lsPodResp.Pods {
-			tr := utils.GetTimeRange(nil, nil, gDClient.DataPipe.DataAmountSec, true, gDClient.DataPipe.DataGranularitySec)
+			// tr := utils.GetTimeRange(nil, nil, gDClient.DataPipe.DataAmountSec, true, gDClient.DataPipe.DataGranularitySec)
 			namespace := gDClient.ConvertPodNamespace(v)
-			podRecommendations, err := gDClient.ListPodRecommendations(namespace, tr)
+			podRecommendations, err := gDClient.ListPodRecommendations(namespace, nil)
 			if err != nil {
-				gDClient.Scope.Error(fmt.Sprintf("Failed to get pod metrics, %v", err))
+				gDClient.Scope.Errorf(fmt.Sprintf("Failed to get %s pod recommendations, %v", namespace, err))
 				continue
 			}
-			podRC := podRecommendations.PodRecommendations
-			if podRC != nil {
-				crWriter.CreatePodRecommendations(context.Background(), podRC)
+			if podRecommendations == nil {
+				gDClient.Scope.Warnf(fmt.Sprintf("Current %s pod did not have recommendations", namespace))
+			}
+			if podRecommendations.Status.Code != 0 {
+				gDClient.Scope.Errorf(fmt.Sprintf("Failed to get %s pod recommendations(%d), %s", namespace, podRecommendations.Status.Code, podRecommendations.Status.GetMessage()))
+			} else {
+				podRC := podRecommendations.PodRecommendations
+				if podRC != nil {
+					gDClient.Scope.Debugf(fmt.Sprintf("Start to write %s pod recommendations: %v", namespace, podRC))
+					crWriter.CreatePodRecommendations(context.Background(), podRC)
+				} else {
+					gDClient.Scope.Warnf(fmt.Sprintf("Current %s pod did not have CR", namespace))
+				}
 			}
 		}
 	}

@@ -11,8 +11,6 @@ import (
 	OperatorReconcilerAlamedaRecommendation "github.com/containers-ai/alameda/operator/pkg/reconciler/alamedarecommendation"
 	DatahubV1Alpha1                         "github.com/containers-ai/api/alameda_api/v1alpha1/datahub"
 	"k8s.io/apimachinery/pkg/types"
-	"github.com/containers-ai/api/datahub/recommendations"
-	"unsafe"
 )
 
 type CrWriter struct {
@@ -38,7 +36,7 @@ func NewCrWriter(scope *logUtil.Scope) (*CrWriter, error) {
 	return &CrWriter{k8sCli, scope}, nil
 }
 
-func (c *CrWriter) CreatePodRecommendations(ctx context.Context, in []*recommendations.PodRecommendation) {
+func (c *CrWriter) CreatePodRecommendations(ctx context.Context, in []*DatahubV1Alpha1.PodRecommendation) {
 	for _, podRecommendation := range in {
 		podNS := podRecommendation.GetNamespacedName().Namespace
 		podName := podRecommendation.GetNamespacedName().Name
@@ -49,7 +47,7 @@ func (c *CrWriter) CreatePodRecommendations(ctx context.Context, in []*recommend
 			Name:      podName,
 		}, alamedaRecommendation); err == nil {
 			alamedarecommendationReconciler := OperatorReconcilerAlamedaRecommendation.NewReconciler(c.K8sClient, alamedaRecommendation)
-			if alamedaRecommendation, err = alamedarecommendationReconciler.UpdateResourceRecommendation((*DatahubV1Alpha1.PodRecommendation)(unsafe.Pointer(podRecommendation))); err == nil {
+			if alamedaRecommendation, err = alamedarecommendationReconciler.UpdateResourceRecommendation(podRecommendation); err == nil {
 				if err = c.K8sClient.Update(context.TODO(), alamedaRecommendation); err != nil {
 					c.Scope.Error(err.Error())
 				}

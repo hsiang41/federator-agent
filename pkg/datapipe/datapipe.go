@@ -9,12 +9,14 @@ import (
 	dataPipeMetrics "github.com/containers-ai/api/datapipe/metrics"
 	dataPipeResources "github.com/containers-ai/api/datapipe/resources"
 	"github.com/containers-ai/api/datapipe/predictions"
-	"github.com/containers-ai/api/datapipe/recommendations"
 	"github.com/containers-ai/api/datahub/resources"
 	"github.com/containers-ai/api/datahub/metrics"
 	"github.com/containers-ai/api/common"
 	"fmt"
 	datahub_v1a1pha1 "github.com/containers-ai/api/alameda_api/v1alpha1/datahub"
+	"unsafe"
+	"google.golang.org/grpc/status"
+	"google.golang.org/grpc/codes"
 )
 
 type DatapipeConfig struct {
@@ -51,7 +53,7 @@ func (d *DataPipeClient) GetNodes() (*datahub_v1a1pha1.ListNodesResponse, error)
 		return nil, err
 	}
 
-	d.Scope.Debug(fmt.Sprintf("get Nodes status: %v", rep))
+	d.Scope.Debug(fmt.Sprintf("get Nodes: %v", rep))
 	return rep, nil
 }
 
@@ -71,7 +73,7 @@ func (d *DataPipeClient) GetPods() (*datahub_v1a1pha1.ListPodsResponse, error) {
 		d.Scope.Error(fmt.Sprintf("Failed to list pods, %v", err))
 		return nil, err
 	}
-	d.Scope.Debug(fmt.Sprintf("get Pods status: %v", rep.Status.Code))
+	d.Scope.Debug(fmt.Sprintf("get Pods: %v", rep))
 	return rep, nil
 }
 
@@ -270,7 +272,8 @@ func (d *DataPipeClient) GetPodsPredictions(namespaces *resources.NamespacedName
 	return rep, nil
 }
 
-func (d *DataPipeClient) ListPodRecommendations(namespaces *resources.NamespacedName, timeRange *common.TimeRange) (*recommendations.ListPodRecommendationsResponse, error) {
+func (d *DataPipeClient) ListPodRecommendations(namespaces *resources.NamespacedName, timeRange *common.TimeRange) (*datahub_v1a1pha1.ListPodRecommendationsResponse, error) {
+	var qD common.QueryCondition
 	conn, err := grpc.Dial(d.DataPipe.DataPipe.Address, grpc.WithInsecure())
 	if err != nil {
 		d.Scope.Error(fmt.Sprintf("Failed to connect datapipe %s, %v", d.DataPipe.DataPipe.Address, err))
@@ -278,19 +281,33 @@ func (d *DataPipeClient) ListPodRecommendations(namespaces *resources.Namespaced
 	}
 	defer conn.Close()
 
-	datapipeClient := recommendations.NewRecommendationsServiceClient(conn)
-	qD := common.QueryCondition{
-		TimeRange: timeRange,
+	datapipeClient := datahub_v1a1pha1.NewDatahubServiceClient(conn)
+	if timeRange != nil {
+		qD = common.QueryCondition{
+			TimeRange: timeRange,
+		}
+	} else {
+		qD = common.QueryCondition{Limit: uint64(1), Order: 1}
 	}
-	req := &recommendations.ListPodRecommendationsRequest{
-		NamespacedName: namespaces,
-		QueryCondition: &qD,
+	d.Scope.Debugf(fmt.Sprintf("Query condition: %v", qD))
+	req := &datahub_v1a1pha1.ListPodRecommendationsRequest{
+		NamespacedName: (*datahub_v1a1pha1.NamespacedName)(unsafe.Pointer(namespaces)),
+		QueryCondition: (*datahub_v1a1pha1.QueryCondition)(unsafe.Pointer(&qD)),
 	}
 	rep, err := datapipeClient.ListPodRecommendations(context.Background(), req)
 	if err != nil {
+		d.Scope.Errorf(fmt.Sprintf("Failed to list %s pods recommendation: %v", ((*datahub_v1a1pha1.NamespacedName)(unsafe.Pointer(namespaces))).Namespace, err))
 		return nil, err
 	}
-	d.Scope.Debug(fmt.Sprintf("List pods recommendations status: %v", rep))
+	if rep.Status.Code != 0 {
+		d.Scope.Errorf(fmt.Sprintf("Failed to list %s pods recommendation(%d): %v",
+			((*datahub_v1a1pha1.NamespacedName)(unsafe.Pointer(namespaces))).Namespace,
+			rep.Status.Code, rep.Status.GetMessage()))
+		return nil, status.Errorf(codes.Internal, fmt.Sprintf("Failed to list %s pods recommendation(%d): %v",
+			((*datahub_v1a1pha1.NamespacedName)(unsafe.Pointer(namespaces))).Namespace,
+			rep.Status.Code, rep.Status.GetMessage()))
+	}
+	d.Scope.Debugf(fmt.Sprintf("List %s pods recommendations status: %v", ((*datahub_v1a1pha1.NamespacedName)(unsafe.Pointer(namespaces))).Namespace, rep))
 	return rep, nil
 }
 
