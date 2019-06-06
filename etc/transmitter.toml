@@ -1,0 +1,17 @@
+[log]
+ set-logcallers = true
+ output-level = "debug" # debug, info, warn, error, fatal, none
+
+[input_jobs]
+    [input_jobs.datapipe_input]
+    name = "datapipe_input"
+    schedule-spec = "*/5 * * * * ?"
+    lib-path = "/lib/inputlib/datapipe.so"
+    lib-configuration = "/etc/alameda/federatorai-agent/input/datapipe.toml"
+
+[output_jobs]
+    [output_jobs.datapipe_output]
+    name = "datapipe_output"
+    schedule-spec = "*/30 * * * * ?"
+    lib-path = "lib/outputlib/datapipe_recommender.so"
+    lib-configuration = "/etc/alameda/federatorai-agent/output/datapipe.toml"

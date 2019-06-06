@@ -1,0 +1,75 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: federatorai-agent-config
+  namespace: federatorai
+data:
+  transmitter.toml: |-
+    [log]
+     set-logcallers = true
+     output-level = "debug" # debug, info, warn, error, fatal, none
+
+    [input_jobs]
+        [input_jobs.datapipe_input]
+        name = "datapipe_input"
+        schedule-spec = "*/5 * * * * ?"
+        lib-path = "/lib/inputlib/datapipe.so"
+        lib-configuration = "/etc/alameda/federatorai-agent/input/datapipe.toml"
+
+    [output_jobs]
+        [output_jobs.datapipe_output]
+        name = "datapipe_output"
+        schedule-spec = "*/30 * * * * ?"
+        lib-path = "lib/outputlib/datapipe_recommender.so"
+        lib-configuration = "/etc/alameda/federatorai-agent/output/datapipe.toml"
+
+  datapipe.toml: |
+    data_granularity_sec = 30
+    data_amount_init_sec = 300
+    data_amount_sec = 3600
+
+    [datapipe]
+    address = "alameda-datapipe.federatorai.svc:50060"
+
+    [datapipe."retry-interval"]
+    default = 3
+---
+
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: federatorai-agent
+  namespace: federatorai
+spec:
+  selector:
+    matchLabels:
+      app: federatorai-agent
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: federatorai-agent
+    spec:
+      containers:
+      - name: federatorai-agent
+        image: docker-registry.default.svc:5000/federatorai-agent/transmitter:latest
+        imagePullPolicy: Always
+        volumeMounts:
+          - name: federatorai-agent-config
+            mountPath: /etc/alameda/federatorai-agent/transmitter.toml
+            subPath: transmitter.toml
+          - name: federatorai-agent-config
+            mountPath: /etc/alameda/federatorai-agent/input/datapipe.toml
+            subPath: datapipe.toml
+          - name: federatorai-agent-config
+            mountPath: /etc/alameda/federatorai-agent/output/datapipe.toml
+            subPath: datapipe.toml
+      volumes:
+        - name: federatorai-agent-config
+          configMap:
+            name: federatorai-agent-config
+          items:
+            - key: transmitter.toml
+              path: transmitter.toml
+            - key: datapipe.toml
+              path: datapipe.toml
