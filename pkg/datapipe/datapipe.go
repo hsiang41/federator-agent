@@ -77,7 +77,7 @@ func (d *DataPipeClient) GetPods() (*datahub_v1a1pha1.ListPodsResponse, error) {
 	return rep, nil
 }
 
-func (d *DataPipeClient) GetNodeMetrics(nodeNames []string, timeRange *common.TimeRange) (*dataPipeMetrics.ListNodeMetricsResponse, error) {
+func (d *DataPipeClient) GetNodeMetrics(nodeNames []string, timeRange *common.TimeRange, limit uint64) (*dataPipeMetrics.ListNodeMetricsResponse, error) {
 	conn, err := grpc.Dial(d.DataPipe.DataPipe.Address, grpc.WithInsecure())
 	if err != nil {
 		d.Scope.Error(fmt.Sprintf("Failed to connect datapipe %s, %v", d.DataPipe.DataPipe.Address, err))
@@ -87,6 +87,10 @@ func (d *DataPipeClient) GetNodeMetrics(nodeNames []string, timeRange *common.Ti
 	datapipeClient := dataPipeMetrics.NewMetricsServiceClient(conn)
 	qD := common.QueryCondition{
 		TimeRange: timeRange,
+		Order: common.QueryCondition_DESC,
+	}
+	if limit > 0 {
+		qD.Limit = limit
 	}
 	req := dataPipeMetrics.ListNodeMetricsRequest{
 		NodeNames: nodeNames,
@@ -102,7 +106,7 @@ func (d *DataPipeClient) GetNodeMetrics(nodeNames []string, timeRange *common.Ti
 	return rep, nil
 }
 
-func (d *DataPipeClient) GetPodMetrics(namespaces *resources.NamespacedName, timeRange *common.TimeRange) (*dataPipeMetrics.ListPodMetricsResponse, error) {
+func (d *DataPipeClient) GetPodMetrics(namespaces *resources.NamespacedName, timeRange *common.TimeRange, limit uint64) (*dataPipeMetrics.ListPodMetricsResponse, error) {
 	conn, err := grpc.Dial(d.DataPipe.DataPipe.Address, grpc.WithInsecure())
 	if err != nil {
 		d.Scope.Error(fmt.Sprintf("Failed to connect datapipe %s, %v", d.DataPipe.DataPipe.Address, err))
@@ -112,6 +116,10 @@ func (d *DataPipeClient) GetPodMetrics(namespaces *resources.NamespacedName, tim
 	datapipeClient := dataPipeMetrics.NewMetricsServiceClient(conn)
 	qD := common.QueryCondition{
 		TimeRange: timeRange,
+		Order: common.QueryCondition_DESC,
+	}
+	if limit > 0 {
+		qD.Limit = limit
 	}
 
 	req := dataPipeMetrics.ListPodMetricsRequest{
@@ -224,7 +232,7 @@ func (d *DataPipeClient) CreatePodMetrics(podsMetrics []*metrics.PodMetric) erro
 	return nil
 }
 
-func (d *DataPipeClient) GetNodesPredictions(nodesName []string, timeRange *common.TimeRange) (*predictions.ListNodePredictionsResponse, error) {
+func (d *DataPipeClient) GetNodesPredictions(nodesName []string, timeRange *common.TimeRange, limit uint64) (*predictions.ListNodePredictionsResponse, error) {
 	conn, err := grpc.Dial(d.DataPipe.DataPipe.Address, grpc.WithInsecure())
 	if err != nil {
 		d.Scope.Error(fmt.Sprintf("Failed to connect datapipe %s, %v", d.DataPipe.DataPipe.Address, err))
@@ -235,6 +243,10 @@ func (d *DataPipeClient) GetNodesPredictions(nodesName []string, timeRange *comm
 	datapipeClient := predictions.NewPredictionsServiceClient(conn)
 	qD := common.QueryCondition{
 		TimeRange: timeRange,
+		Order: common.QueryCondition_DESC,
+	}
+	if limit > 0 {
+		qD.Limit = limit
 	}
 	req := &predictions.ListNodePredictionsRequest{
 		NodeNames: nodesName,
@@ -248,7 +260,7 @@ func (d *DataPipeClient) GetNodesPredictions(nodesName []string, timeRange *comm
 	return rep, nil
 }
 
-func (d *DataPipeClient) GetPodsPredictions(namespaces *resources.NamespacedName, timeRange *common.TimeRange) (*predictions.ListPodPredictionsResponse, error) {
+func (d *DataPipeClient) GetPodsPredictions(namespaces *resources.NamespacedName, timeRange *common.TimeRange, limit uint64) (*predictions.ListPodPredictionsResponse, error) {
 	conn, err := grpc.Dial(d.DataPipe.DataPipe.Address, grpc.WithInsecure())
 	if err != nil {
 		d.Scope.Error(fmt.Sprintf("Failed to connect datapipe %s, %v", d.DataPipe.DataPipe.Address, err))
@@ -259,6 +271,10 @@ func (d *DataPipeClient) GetPodsPredictions(namespaces *resources.NamespacedName
 	datapipeClient := predictions.NewPredictionsServiceClient(conn)
 	qD := common.QueryCondition{
 		TimeRange: timeRange,
+		Order: common.QueryCondition_DESC,
+	}
+	if limit > 0 {
+		qD.Limit = limit
 	}
 	req := &predictions.ListPodPredictionsRequest{
 		NamespacedName: namespaces,
@@ -272,8 +288,8 @@ func (d *DataPipeClient) GetPodsPredictions(namespaces *resources.NamespacedName
 	return rep, nil
 }
 
-func (d *DataPipeClient) ListPodRecommendations(namespaces *resources.NamespacedName, timeRange *common.TimeRange) (*datahub_v1a1pha1.ListPodRecommendationsResponse, error) {
-	var qD common.QueryCondition
+func (d *DataPipeClient) ListPodRecommendations(namespaces *resources.NamespacedName, timeRange *common.TimeRange, limit uint64) (*datahub_v1a1pha1.ListPodRecommendationsResponse, error) {
+	var qD datahub_v1a1pha1.QueryCondition
 	conn, err := grpc.Dial(d.DataPipe.DataPipe.Address, grpc.WithInsecure())
 	if err != nil {
 		d.Scope.Error(fmt.Sprintf("Failed to connect datapipe %s, %v", d.DataPipe.DataPipe.Address, err))
@@ -282,17 +298,17 @@ func (d *DataPipeClient) ListPodRecommendations(namespaces *resources.Namespaced
 	defer conn.Close()
 
 	datapipeClient := datahub_v1a1pha1.NewDatahubServiceClient(conn)
+	qD.Order = datahub_v1a1pha1.QueryCondition_DESC
 	if timeRange != nil {
-		qD = common.QueryCondition{
-			TimeRange: timeRange,
-		}
-	} else {
-		qD = common.QueryCondition{Limit: uint64(1), Order: 1}
+		qD.TimeRange = (*datahub_v1a1pha1.TimeRange)(unsafe.Pointer(timeRange))
+	}
+	if limit > 0 {
+		qD.Limit = limit
 	}
 	d.Scope.Debugf(fmt.Sprintf("Query condition: %v", qD))
 	req := &datahub_v1a1pha1.ListPodRecommendationsRequest{
 		NamespacedName: (*datahub_v1a1pha1.NamespacedName)(unsafe.Pointer(namespaces)),
-		QueryCondition: (*datahub_v1a1pha1.QueryCondition)(unsafe.Pointer(&qD)),
+		QueryCondition: &qD,
 	}
 	rep, err := datapipeClient.ListPodRecommendations(context.Background(), req)
 	if err != nil {

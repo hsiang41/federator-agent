@@ -46,7 +46,7 @@ func (i outputlib) Write() error {
 		for _, v := range lsPodResp.Pods {
 			// tr := utils.GetTimeRange(nil, nil, gDClient.DataPipe.DataAmountSec, true, gDClient.DataPipe.DataGranularitySec)
 			namespace := gDClient.ConvertPodNamespace(v)
-			podRecommendations, err := gDClient.ListPodRecommendations(namespace, nil)
+			podRecommendations, err := gDClient.ListPodRecommendations(namespace, nil, 1)
 			if err != nil {
 				gDClient.Scope.Errorf(fmt.Sprintf("Failed to get %s pod recommendations, %v", namespace, err))
 				continue

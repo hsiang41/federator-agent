@@ -5,11 +5,13 @@ import (
 	"fmt"
 	"errors"
 	"strings"
+	"github.com/golang/protobuf/ptypes"
 	"github.com/sheerun/queue"
 	"github.com/spf13/viper"
 	logUtil "github.com/containers-ai/alameda/pkg/utils/log"
 	"github.com/containers-ai/federatorai-agent/pkg/datapipe"
 	"github.com/containers-ai/federatorai-agent/pkg/utils"
+	"time"
 )
 
 type inputLib struct {
@@ -31,9 +33,11 @@ func (i inputLib) Gather() error {
 
 	if lsPodResp != nil {
 		for _, v := range lsPodResp.Pods {
-			tr := utils.GetTimeRange(nil, nil, gDClient.DataPipe.DataAmountSec, true, gDClient.DataPipe.DataGranularitySec)
+			tm := time.Now().UTC()
+			timeTm, _ := ptypes.TimestampProto(tm)
+			tr := utils.GetTimeRange(nil, timeTm, gDClient.DataPipe.DataAmountSec, true, gDClient.DataPipe.DataGranularitySec)
 			namespace := gDClient.ConvertPodNamespace(v)
-			podMetrics, err := gDClient.GetPodMetrics(namespace, tr)
+			podMetrics, err := gDClient.GetPodMetrics(namespace, tr, 0)
 			if err != nil {
 				gDClient.Scope.Error(fmt.Sprintf("Failed to get pod metrics, %v", err))
 				continue
@@ -63,8 +67,10 @@ func (i inputLib) Gather() error {
 			nodesName = append(nodesName, v.GetName())
 		}
 		if len(nodesName) > 0 {
-			tr := utils.GetTimeRange(nil, nil, gDClient.DataPipe.DataAmountSec, true, gDClient.DataPipe.DataGranularitySec)
-			nodeMetrics, err := gDClient.GetNodeMetrics(nodesName, tr)
+			tm := time.Now().UTC()
+			timeTm, _ := ptypes.TimestampProto(tm)
+			tr := utils.GetTimeRange(nil, timeTm, gDClient.DataPipe.DataAmountSec, true, gDClient.DataPipe.DataGranularitySec)
+			nodeMetrics, err := gDClient.GetNodeMetrics(nodesName, tr, 0)
 			if err != nil {
 				gDClient.Scope.Error(fmt.Sprintf("Failed to get nodes metrics, %v", err))
 			}
