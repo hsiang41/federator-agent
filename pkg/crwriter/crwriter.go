@@ -69,7 +69,7 @@ func (c *CrWriter) CreatePodRecommendations(ctx context.Context, in []*DatahubV1
 				if err = c.K8sClient.Update(context.TODO(), alamedaRecommendation); err != nil {
 					c.Scope.Error(err.Error())
 				} else {
-					c.Scope.Debugf(fmt.Sprintf("Succeed to CreatePodRecommendations %s %s", podNS, podName))
+					c.Scope.Debugf(fmt.Sprintf("Succeed to CreatePodRecommendations %s %s, recommendation: %v", podNS, podName, podRecommendation))
 				}
 			} else {
 				c.Scope.Errorf(fmt.Sprintf("Failed to update resource recommendation: %v", err))
