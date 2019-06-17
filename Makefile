@@ -49,6 +49,7 @@ install: install_dir
 	cp -fv lib/outputlib/datapipe_recommender.so $(INSTALL_ROOT)/lib/outputlib/datapipe_recommender.so
 	cp -fv transmitter/transmitter $(DEST_PREFIX)/bin/
 	ln -sfv $(PRODUCT_ROOT)/etc $(INSTALL_ROOT)/etc/alameda/federatorai-agent
+	cp -fv $(SRC_DIR)/xray.sh $(DEST_PREFIX)/bin/ && chmod 755 $(DEST_PREFIX)/bin/xray.sh
 	# generate version.txt
 	echo "CODE_VERSION=$(CODE_VERSION)" >> $(DEST_PREFIX)/etc/version.txt
 	cd $(INSTALL_ROOT); tar -czvf $(SRC_DIR)/install_root.tgz .; cd -
