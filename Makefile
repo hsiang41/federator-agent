@@ -1,3 +1,9 @@
+# compute source code references
+GIT_COMMIT = $(shell git rev-parse --short HEAD || echo 'none')
+_TMP_STR = $(shell git show-ref --abbrev --head | grep "^$(GIT_COMMIT) " | grep -v HEAD | head -1 | awk '{print $$NF}')
+GIT_REF ?= $(shell [ "$(_TMP_STR)" = "" ] && echo "HEAD" || echo $(_TMP_STR))
+GIT_DIRTY = $(shell git diff --quiet || echo '-dirty')
+CODE_VERSION = "$(GIT_REF)@$(GIT_COMMIT)$(GIT_DIRTY)"
 
 # Image URL to use all building/pushing image targets
 IMG ?= federatorai-agent:latest
@@ -43,6 +49,8 @@ install: install_dir
 	cp -fv lib/outputlib/datapipe_recommender.so $(INSTALL_ROOT)/lib/outputlib/datapipe_recommender.so
 	cp -fv transmitter/transmitter $(DEST_PREFIX)/bin/
 	ln -sfv $(PRODUCT_ROOT)/etc $(INSTALL_ROOT)/etc/alameda/federatorai-agent
+	# generate version.txt
+	echo "CODE_VERSION=$(CODE_VERSION)" >> $(DEST_PREFIX)/etc/version.txt
 	cd $(INSTALL_ROOT); tar -czvf $(SRC_DIR)/install_root.tgz .; cd -
 
 clean:
@@ -75,9 +83,9 @@ generate:
 
 ## docker-build: Build the docker image.
 docker-build-alpine:
-	docker build . -t ${IMG} -f Dockerfile
+	docker build -t ${IMG} -f Dockerfile .
 
 docker-build-ubi:
-	docker build . -t ${IMG} -f Dockerfile.ubi
+	docker build -t ${IMG} -f Dockerfile.ubi .
 
 docker-build: docker-build-ubi

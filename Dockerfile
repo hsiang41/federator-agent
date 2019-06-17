@@ -16,12 +16,13 @@ FROM ubuntu:18.04
 # FROM alpine:latest
 # FROM busybox:latest
 
-WORKDIR /root/
+ENV AIHOME=/opt/alameda/federatorai-agent
+WORKDIR ${AIHOME}
 COPY --from=builder /go/src/github.com/containers-ai/federatorai-agent/install_root.tgz /tmp/
 
 RUN set -x \
     && cd / && tar xzvf /tmp/install_root.tgz && rm -fv /tmp/install_root.tgz \
-    && chown -R 1001:0 /opt/alameda \
+    && chown -R 1001:0 ${AIHOME} \
     && mkdir -p /var/log/alameda && chown -R 1001:0 /var/log/alameda && chmod ug+w /var/log/alameda
 
 USER 1001
