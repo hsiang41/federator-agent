@@ -3,12 +3,11 @@ package influxdb
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/containers-ai/alameda/pkg/utils/log"
+	InfluxDBClient "github.com/influxdata/influxdb/client/v2"
 	"strconv"
 	"strings"
 	"time"
-
-	"github.com/containers-ai/alameda/pkg/utils/log"
-	client "github.com/influxdata/influxdb/client/v2"
 )
 
 type Database string
@@ -71,8 +70,8 @@ func (influxDBRepository *InfluxDBRepository) ModifyDefaultRetentionPolicy(db st
 	return err
 }
 
-func (influxDBRepository *InfluxDBRepository) newHttpClient() client.Client {
-	clnt, err := client.NewHTTPClient(client.HTTPConfig{
+func (influxDBRepository *InfluxDBRepository) newHttpClient() InfluxDBClient.Client {
+	clnt, err := InfluxDBClient.NewHTTPClient(InfluxDBClient.HTTPConfig{
 		Addr:               influxDBRepository.Address,
 		Username:           influxDBRepository.Username,
 		Password:           influxDBRepository.Password,
@@ -85,11 +84,11 @@ func (influxDBRepository *InfluxDBRepository) newHttpClient() client.Client {
 }
 
 // WritePoints writes points to database
-func (influxDBRepository *InfluxDBRepository) WritePoints(points []*client.Point, bpCfg client.BatchPointsConfig) error {
+func (influxDBRepository *InfluxDBRepository) WritePoints(points []*InfluxDBClient.Point, bpCfg InfluxDBClient.BatchPointsConfig) error {
 	clnt := influxDBRepository.newHttpClient()
 	defer clnt.Close()
 
-	bp, err := client.NewBatchPoints(bpCfg)
+	bp, err := InfluxDBClient.NewBatchPoints(bpCfg)
 	if err != nil {
 		scope.Error(err.Error())
 	}
@@ -118,10 +117,10 @@ func (influxDBRepository *InfluxDBRepository) WritePoints(points []*client.Point
 }
 
 // QueryDB queries database
-func (influxDBRepository *InfluxDBRepository) QueryDB(cmd, database string) (res []client.Result, err error) {
+func (influxDBRepository *InfluxDBRepository) QueryDB(cmd, database string) (res []InfluxDBClient.Result, err error) {
 	clnt := influxDBRepository.newHttpClient()
 	defer clnt.Close()
-	q := client.Query{
+	q := InfluxDBClient.Query{
 		Command:  cmd,
 		Database: database,
 	}
@@ -136,7 +135,7 @@ func (influxDBRepository *InfluxDBRepository) QueryDB(cmd, database string) (res
 	return res, nil
 }
 
-func PackMap(results []client.Result) []*InfluxDBRow {
+func PackMap(results []InfluxDBClient.Result) []*InfluxDBRow {
 	var rows []*InfluxDBRow
 
 	if len(results[0].Series) == 0 {
@@ -260,6 +259,10 @@ func (influxDBRepository *InfluxDBRepository) AddWhereConditionDirect(whereStr *
 }
 
 func (influxDBRepository *InfluxDBRepository) AddTimeCondition(whereStr *string, operator string, value int64) {
+	if value == 0 {
+		return
+	}
+
 	tm := time.Unix(int64(value), 0)
 
 	if *whereStr == "" {
