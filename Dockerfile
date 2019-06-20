@@ -11,19 +11,27 @@ ADD . .
 # Build
 RUN make build
 
-# Copy the controller-manager into a thin image
+# Prepare the package into a thin image
 FROM ubuntu:18.04
 # FROM alpine:latest
 # FROM busybox:latest
 
-ENV AIHOME=/opt/alameda/federatorai-agent
+ENV AIHOME=/opt/alameda/federatorai-agent \
+    USER_UID=1001 \
+    USER_NAME=alameda
+
 WORKDIR ${AIHOME}
+COPY --from=builder /go/src/github.com/containers-ai/federatorai-agent/tini /sbin/tini
 COPY --from=builder /go/src/github.com/containers-ai/federatorai-agent/install_root.tgz /tmp/
 
 RUN set -x \
+    && echo "${USER_NAME}:x:${USER_UID}:0:Federator.ai:${AIHOME}:/bin/sh" >> /etc/passwd \
+    && chmod ug+w /var/log \
+    # install packages
     && cd / && tar xzvf /tmp/install_root.tgz && rm -fv /tmp/install_root.tgz \
-    && chown -R 1001:0 ${AIHOME} \
-    && mkdir -p /var/log/alameda && chown -R 1001:0 /var/log/alameda && chmod ug+w /var/log/alameda
+    && chown -R ${USER_UID}:root ${AIHOME} && chmod -R ug+w ${AIHOME} \
+    && mkdir -pv -m 775 /var/log/alameda && chown -R ${USER_UID}:root /var/log/alameda
 
-USER 1001
-ENTRYPOINT ["/opt/alameda/federatorai-agent/bin/transmitter", "run"]
+USER ${USER_UID}
+ENTRYPOINT ["/sbin/tini","-v", "--"]
+CMD ["/init.sh"]
