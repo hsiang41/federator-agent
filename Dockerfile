@@ -25,8 +25,14 @@ COPY --from=builder /go/src/github.com/containers-ai/federatorai-agent/tini /sbi
 COPY --from=builder /go/src/github.com/containers-ai/federatorai-agent/install_root.tgz /tmp/
 
 RUN set -x \
+    && apt-get update && apt-get install -y --force-yes --no-install-recommends vim logrotate \
+    && apt-get autoclean && apt-get autoremove && rm -rf /var/lib/apt/lists/* \
     && echo "${USER_NAME}:x:${USER_UID}:0:Federator.ai:${AIHOME}:/bin/sh" >> /etc/passwd \
-    && chmod ug+w /var/log \
+    # The following lines for logrotate - startup script will add running user id into /etc/passwd
+    && chmod g+w /etc/passwd \
+    # logrotate need writable permission on "/var/lib/logrotate"
+    && chmod ug+w /var/lib/logrotate /var/log \
+    && sed -i -e '/su root syslog/d' /etc/logrotate.conf \
     # install packages
     && cd / && tar xzvf /tmp/install_root.tgz && rm -fv /tmp/install_root.tgz \
     && chown -R ${USER_UID}:root ${AIHOME} && chmod -R ug+w ${AIHOME} \

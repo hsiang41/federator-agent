@@ -39,7 +39,7 @@ binaries:
 	  -a -o ./transmitter/transmitter github.com/containers-ai/federatorai-agent/cmd
 
 install_dir:
-	mkdir -pv $(INSTALL_ROOT)/etc/alameda $(INSTALL_ROOT)/lib/inputlib $(INSTALL_ROOT)/lib/outputlib $(DEST_PREFIX)/bin $(DEST_PREFIX)/etc/input $(DEST_PREFIX)/etc/output
+	mkdir -pv $(INSTALL_ROOT)/etc/logrotate.d $(INSTALL_ROOT)/etc/alameda $(INSTALL_ROOT)/lib/inputlib $(INSTALL_ROOT)/lib/outputlib $(DEST_PREFIX)/bin $(DEST_PREFIX)/etc/input $(DEST_PREFIX)/etc/output
 
 install: install_dir
 	cp -fv etc/transmitter.toml $(DEST_PREFIX)/etc/transmitter.toml
@@ -52,6 +52,9 @@ install: install_dir
 	cp -fv $(SRC_DIR)/xray.sh $(DEST_PREFIX)/bin/ && chmod 755 $(DEST_PREFIX)/bin/xray.sh
 	# generate version.txt
 	echo "CODE_VERSION=$(CODE_VERSION)" >> $(DEST_PREFIX)/etc/version.txt
+	# logrotate.conf
+	cp -fv $(SRC_DIR)/logrotate.conf $(DEST_PREFIX)/etc/
+	ln -sfv $(PRODUCT_ROOT)/etc/logrotate.conf $(INSTALL_ROOT)/etc/logrotate.d/alameda-apiserver
 	# init.sh
 	cp -fv $(SRC_DIR)/init.sh $(INSTALL_ROOT)/init.sh && chmod 755 $(INSTALL_ROOT)/init.sh
 	cd $(INSTALL_ROOT); tar -czvf $(SRC_DIR)/install_root.tgz .; cd -
