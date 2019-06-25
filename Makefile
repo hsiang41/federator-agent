@@ -67,7 +67,7 @@ clobber: clean
 
 build: lib binaries install
 
-.PHONY: run
+.PHONY: run lib binaries
 
 # Run against the configured Kubernetes cluster in ~/.kube/config
 run: generate fmt vet
