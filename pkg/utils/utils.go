@@ -27,7 +27,7 @@ func GetTimeRange(startTime *timestamp.Timestamp, endTime *timestamp.Timestamp, 
 		endTime, _ = ptypes.TimestampProto(eTm)
 	}
 
-	duTime, _ := time.ParseDuration(fmt.Sprintf("%ds", durationTime))
+	duTime, _ := time.ParseDuration(fmt.Sprintf("%ds", initGronularitySec))
 	du := ptypes.DurationProto(duTime)
 
 	return &CommonLib.TimeRange{StartTime:startTime, EndTime:endTime, Step: du, AggregateFunction: 1}
