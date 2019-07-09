@@ -1,4 +1,4 @@
-# This Dockerfile is used for building evictioner on https://connect.redhat.com
+# This Dockerfile is used for building container on https://connect.redhat.com
 FROM openshift/origin-release:golang-1.11 as builder
 #RUN yum update -y
 
@@ -51,4 +51,4 @@ RUN set -x \
 
 USER ${USER_ID}
 ENTRYPOINT ["/sbin/tini","-v", "--"]
-CMD ["/init.sh"]
+CMD ["/init.sh", "start"]

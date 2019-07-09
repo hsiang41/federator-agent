@@ -40,4 +40,4 @@ RUN set -x \
 
 USER ${USER_UID}
 ENTRYPOINT ["/sbin/tini","-v", "--"]
-CMD ["/init.sh"]
+CMD ["/init.sh", "start"]
