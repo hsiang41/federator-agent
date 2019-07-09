@@ -65,7 +65,7 @@ clean:
 clobber: clean
 	rm -rf install_root
 
-build: lib binaries install
+build: all lib binaries install
 
 .PHONY: run lib binaries
 
@@ -77,15 +77,15 @@ run: generate fmt vet
 
 # Run go fmt against code
 fmt:
-	go fmt ./cmd/...
+	go fmt ./cmd/... ./pkg/...
 
 # Run go vet against code
 vet:
-	go vet ./cmd/...
+	go vet ./cmd/... ./pkg/...
 
 # Generate code
 generate:
-	go generate ./cmd/...
+	go generate ./cmd/... ./pkg/...
 
 ## docker-build: Build the docker image.
 docker-build-alpine:
