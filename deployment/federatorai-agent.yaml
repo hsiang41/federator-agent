@@ -20,7 +20,7 @@ data:
         [output_jobs.datapipe_output]
         name = "datapipe_output"
         schedule-spec = "*/30 * * * * ?"
-        lib-path = "lib/outputlib/datapipe_recommender.so"
+        lib-path = "/lib/outputlib/datapipe_recommender.so"
         lib-configuration = "/etc/alameda/federatorai-agent/output/datapipe.toml"
 
   datapipe.toml: |

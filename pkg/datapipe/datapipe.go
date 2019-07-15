@@ -340,11 +340,10 @@ func (d *DataPipeClient) ConvertPodNamespace(pod *datahubV1a1pha1.Pod) (*resourc
 	if pod == nil {
 		return &resources.NamespacedName{}
 	}
-	return &resources.NamespacedName{
-		pod.NamespacedName.Namespace,
-		pod.NamespacedName.Name,
-		pod.NamespacedName.XXX_NoUnkeyedLiteral,
-		pod.NamespacedName.XXX_unrecognized,
-		pod.NamespacedName.XXX_sizecache,
+	return &resources.NamespacedName{Namespace:pod.NamespacedName.Namespace,
+		Name: pod.NamespacedName.Name,
+		XXX_NoUnkeyedLiteral: pod.NamespacedName.XXX_NoUnkeyedLiteral,
+		XXX_unrecognized: pod.NamespacedName.XXX_unrecognized,
+		XXX_sizecache: pod.NamespacedName.XXX_sizecache,
 	}
 }
