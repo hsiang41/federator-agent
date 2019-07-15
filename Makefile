@@ -54,13 +54,13 @@ install: install_dir
 	echo "CODE_VERSION=$(CODE_VERSION)" >> $(DEST_PREFIX)/etc/version.txt
 	# logrotate.conf
 	cp -fv $(SRC_DIR)/logrotate.conf $(DEST_PREFIX)/etc/
-	ln -sfv $(PRODUCT_ROOT)/etc/logrotate.conf $(INSTALL_ROOT)/etc/logrotate.d/alameda-apiserver
+	ln -sfv $(PRODUCT_ROOT)/etc/logrotate.conf $(INSTALL_ROOT)/etc/logrotate.d/federatorai-agent
 	# init.sh
 	cp -fv $(SRC_DIR)/init.sh $(INSTALL_ROOT)/init.sh && chmod 755 $(INSTALL_ROOT)/init.sh
 	cd $(INSTALL_ROOT); tar -czvf $(SRC_DIR)/install_root.tgz .; cd -
 
 clean:
-	rm -fv build/build-image/bin/apiserver install_root.tgz *~
+	rm -fv ./transmitter/transmitter install_root.tgz *~
 
 clobber: clean
 	rm -rf install_root
