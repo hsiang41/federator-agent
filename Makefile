@@ -30,8 +30,8 @@ federatorai-agent: generate fmt vet binaries lib
 lib:
 	CGO_ENABLED=1 GOOS=linux GOARCH=amd64 go build -buildmode=plugin \
 	  -a -o ./lib/inputlib/datapipe.so github.com/containers-ai/federatorai-agent/pkg/inputlib/alameda_datapipe
-    CGO_ENABLED=1 GOOS=linux GOARCH=amd64 go build -buildmode=plugin \
-      -a -o ./lib/inputlib/datapipe_prometheus.so github.com/containers-ai/federatorai-agent/pkg/inputlib/alameda_prometheus
+	CGO_ENABLED=1 GOOS=linux GOARCH=amd64 go build -buildmode=plugin \
+	  -a -o ./lib/inputlib/datapipe_prometheus.so github.com/containers-ai/federatorai-agent/pkg/inputlib/alameda_prometheus
 	CGO_ENABLED=1 GOOS=linux GOARCH=amd64 go build -buildmode=plugin \
 	  -a -o ./lib/outputlib/datapipe_recommender.so github.com/containers-ai/federatorai-agent/pkg/outputlib/alameda_recommender
 
