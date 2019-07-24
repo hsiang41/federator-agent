@@ -8,7 +8,7 @@ import (
 	"fmt"
 )
 
-func GetTimeRange(startTime *timestamp.Timestamp, endTime *timestamp.Timestamp, durationTime int32, isInit bool, initGronularitySec int32) *CommonLib.TimeRange {
+func GetTimeRange(startTime *timestamp.Timestamp, endTime *timestamp.Timestamp, durationTime int32, isInit bool, step int32) *CommonLib.TimeRange {
 	if startTime == nil {
 		sTm, _ := ptypes.Timestamp(endTime)
 		du, _ := time.ParseDuration(fmt.Sprintf("-%ds", durationTime))
@@ -27,8 +27,8 @@ func GetTimeRange(startTime *timestamp.Timestamp, endTime *timestamp.Timestamp, 
 		endTime, _ = ptypes.TimestampProto(eTm)
 	}
 
-	duTime, _ := time.ParseDuration(fmt.Sprintf("%ds", initGronularitySec))
+	duTime, _ := time.ParseDuration(fmt.Sprintf("%ds", step))
 	du := ptypes.DurationProto(duTime)
 
-	return &CommonLib.TimeRange{StartTime:startTime, EndTime:endTime, Step: du, AggregateFunction: 1}
+	return &CommonLib.TimeRange{StartTime:startTime, EndTime:endTime, Step: du, AggregateFunction: 0}
 }

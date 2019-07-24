@@ -30,6 +30,8 @@ federatorai-agent: generate fmt vet binaries lib
 lib:
 	CGO_ENABLED=1 GOOS=linux GOARCH=amd64 go build -buildmode=plugin \
 	  -a -o ./lib/inputlib/datapipe.so github.com/containers-ai/federatorai-agent/pkg/inputlib/alameda_datapipe
+    CGO_ENABLED=1 GOOS=linux GOARCH=amd64 go build -buildmode=plugin \
+      -a -o ./lib/inputlib/datapipe_prometheus.so github.com/containers-ai/federatorai-agent/pkg/inputlib/alameda_prometheus
 	CGO_ENABLED=1 GOOS=linux GOARCH=amd64 go build -buildmode=plugin \
 	  -a -o ./lib/outputlib/datapipe_recommender.so github.com/containers-ai/federatorai-agent/pkg/outputlib/alameda_recommender
 
@@ -46,6 +48,7 @@ install: install_dir
 	cp -fv etc/input/datapipe.toml $(DEST_PREFIX)/etc/input/datapipe.toml
 	cp -fv etc/input/datapipe.toml $(DEST_PREFIX)/etc/output/datapipe.toml
 	cp -fv lib/inputlib/datapipe.so $(INSTALL_ROOT)/lib/inputlib/datapipe.so
+	cp -fv lib/inputlib/datapipe_prometheus.so $(INSTALL_ROOT)/lib/inputlib/datapipe_prometheus.so
 	cp -fv lib/outputlib/datapipe_recommender.so $(INSTALL_ROOT)/lib/outputlib/datapipe_recommender.so
 	cp -fv transmitter/transmitter $(DEST_PREFIX)/bin/
 	ln -sfv $(PRODUCT_ROOT)/etc $(INSTALL_ROOT)/etc/alameda/federatorai-agent

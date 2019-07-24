@@ -27,7 +27,12 @@
 
 [[constraint]]
   name = "github.com/containers-ai/alameda"
-  version = "0.3.9"
+  branch = "development"
+
+[[constraint]]
+  name = "github.com/containers-ai/api"
+  branch = "development"
+  source = "https://github.com/containers-ai/api.git"
 
 [prune]
   go-tests = true

@@ -2,7 +2,9 @@ package datapipe
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
+	"unsafe"
 	"github.com/sheerun/queue"
 	"google.golang.org/grpc"
 	logUtil "github.com/containers-ai/alameda/pkg/utils/log"
@@ -10,14 +12,13 @@ import (
 	dataPipeMetrics "github.com/containers-ai/api/datapipe/metrics"
 	dataPipeResources "github.com/containers-ai/api/datapipe/resources"
 	"github.com/containers-ai/api/datapipe/predictions"
+	"github.com/containers-ai/api/datapipe/rawdata"
 	"github.com/containers-ai/api/datahub/resources"
 	"github.com/containers-ai/api/datahub/metrics"
 	"github.com/containers-ai/api/common"
 	datahubV1a1pha1 "github.com/containers-ai/api/alameda_api/v1alpha1/datahub"
-	"unsafe"
 	"google.golang.org/grpc/status"
 	"google.golang.org/grpc/codes"
-	"encoding/json"
 )
 
 type DataPipeConfig struct {
@@ -346,4 +347,65 @@ func (d *DataPipeClient) ConvertPodNamespace(pod *datahubV1a1pha1.Pod) (*resourc
 		XXX_unrecognized: pod.NamespacedName.XXX_unrecognized,
 		XXX_sizecache: pod.NamespacedName.XXX_sizecache,
 	}
+}
+
+func (d *DataPipeClient) GetRawData(expression string, endpoint string, timeRange *common.TimeRange, limit uint64) (*rawdata.ReadRawdataResponse, error) {
+	conn, err := grpc.Dial(d.DataPipe.DataPipe.Address, grpc.WithInsecure())
+	if err != nil {
+		d.Scope.Error(fmt.Sprintf("Failed to connect datapipe %s, %v", d.DataPipe.DataPipe.Address, err))
+		return nil, err
+	}
+	defer conn.Close()
+	datapipeClient := rawdata.NewRawdataServiceClient(conn)
+
+	req := rawdata.ReadRawdataRequest{
+		DatabaseType: common.DatabaseType_PROMETHEUS}
+	query := common.Query{
+		Table: expression,
+		Expression: endpoint,
+		Condition: &common.QueryCondition{
+			TimeRange: timeRange,
+			Order: common.QueryCondition_DESC,
+			Limit: limit},
+	}
+	req.Queries = append(req.Queries, &query)
+
+	rep, err := datapipeClient.ReadRawdata(context.Background(), &req)
+	if err != nil {
+		d.Scope.Error(fmt.Sprintf("Failed to read raw datas, %v", err))
+		return nil, err
+	}
+	/*
+	if rawDatas, err := json.MarshalIndent(rep.Rawdata, "", "  "); err == nil {
+		d.Scope.Debugf(fmt.Sprintf("Read raw datas: %s", string(rawDatas)))
+	}
+	*/
+	return rep, nil
+}
+
+func (d *DataPipeClient) WriteRawData(rawData *rawdata.WriteRawdataRequest) error {
+	conn, err := grpc.Dial(d.DataPipe.DataPipe.Address, grpc.WithInsecure())
+	if err != nil {
+		d.Scope.Error(fmt.Sprintf("Failed to connect datapipe %s, %v", d.DataPipe.DataPipe.Address, err))
+		return err
+	}
+	defer conn.Close()
+	datapipeClient := rawdata.NewRawdataServiceClient(conn)
+
+	rep, err := datapipeClient.WriteRawdata(context.Background(), rawData)
+	if err != nil {
+		d.Scope.Error(fmt.Sprintf("Failed to write raw datas, %v", err))
+		return err
+	}
+	if rep.Code != 0 {
+		return status.Error(codes.Internal, rep.Message)
+	}
+	return nil
+}
+
+func (d *DataPipeClient) SetDataPipeAddress(address string) {
+	if d.DataPipe.DataPipe == nil {
+		d.DataPipe.DataPipe = new(datahub.Config)
+	}
+	d.DataPipe.DataPipe.Address = address
 }
