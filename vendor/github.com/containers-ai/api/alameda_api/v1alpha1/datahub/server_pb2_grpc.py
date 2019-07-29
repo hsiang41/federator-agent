@@ -2,6 +2,7 @@
 import grpc
 
 from alameda_api.v1alpha1.datahub import server_pb2 as alameda__api_dot_v1alpha1_dot_datahub_dot_server__pb2
+from google.protobuf import empty_pb2 as google_dot_protobuf_dot_empty__pb2
 from google.rpc import status_pb2 as google_dot_rpc_dot_status__pb2
 
 
@@ -146,6 +147,11 @@ class DatahubServiceStub(object):
         request_serializer=alameda__api_dot_v1alpha1_dot_datahub_dot_server__pb2.WriteRawdataRequest.SerializeToString,
         response_deserializer=google_dot_rpc_dot_status__pb2.Status.FromString,
         )
+    self.Ping = channel.unary_unary(
+        '/containers_ai.alameda.v1alpha1.datahub.DatahubService/Ping',
+        request_serializer=google_dot_protobuf_dot_empty__pb2.Empty.SerializeToString,
+        response_deserializer=google_dot_rpc_dot_status__pb2.Status.FromString,
+        )
     self.ListWeaveScopeHosts = channel.unary_unary(
         '/containers_ai.alameda.v1alpha1.datahub.DatahubService/ListWeaveScopeHosts',
         request_serializer=alameda__api_dot_v1alpha1_dot_datahub_dot_server__pb2.ListWeaveScopeHostsRequest.SerializeToString,
@@ -185,6 +191,16 @@ class DatahubServiceStub(object):
         '/containers_ai.alameda.v1alpha1.datahub.DatahubService/GetWeaveScopeContainerDetails',
         request_serializer=alameda__api_dot_v1alpha1_dot_datahub_dot_server__pb2.ListWeaveScopeContainersRequest.SerializeToString,
         response_deserializer=alameda__api_dot_v1alpha1_dot_datahub_dot_server__pb2.WeaveScopeResponse.FromString,
+        )
+    self.CreateEvents = channel.unary_unary(
+        '/containers_ai.alameda.v1alpha1.datahub.DatahubService/CreateEvents',
+        request_serializer=alameda__api_dot_v1alpha1_dot_datahub_dot_server__pb2.CreateEventsRequest.SerializeToString,
+        response_deserializer=google_dot_rpc_dot_status__pb2.Status.FromString,
+        )
+    self.ListEvents = channel.unary_unary(
+        '/containers_ai.alameda.v1alpha1.datahub.DatahubService/ListEvents',
+        request_serializer=alameda__api_dot_v1alpha1_dot_datahub_dot_server__pb2.ListEventsRequest.SerializeToString,
+        response_deserializer=alameda__api_dot_v1alpha1_dot_datahub_dot_server__pb2.ListEventsResponse.FromString,
         )
 
 
@@ -375,6 +391,13 @@ class DatahubServiceServicer(object):
     context.set_details('Method not implemented!')
     raise NotImplementedError('Method not implemented!')
 
+  def Ping(self, request, context):
+    """Used to do liveness test
+    """
+    context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+    context.set_details('Method not implemented!')
+    raise NotImplementedError('Method not implemented!')
+
   def ListWeaveScopeHosts(self, request, context):
     """weave scope--------------------------------------------------
     """
@@ -425,6 +448,20 @@ class DatahubServiceServicer(object):
     raise NotImplementedError('Method not implemented!')
 
   def GetWeaveScopeContainerDetails(self, request, context):
+    # missing associated documentation comment in .proto file
+    pass
+    context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+    context.set_details('Method not implemented!')
+    raise NotImplementedError('Method not implemented!')
+
+  def CreateEvents(self, request, context):
+    """events
+    """
+    context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+    context.set_details('Method not implemented!')
+    raise NotImplementedError('Method not implemented!')
+
+  def ListEvents(self, request, context):
     # missing associated documentation comment in .proto file
     pass
     context.set_code(grpc.StatusCode.UNIMPLEMENTED)
@@ -564,6 +601,11 @@ def add_DatahubServiceServicer_to_server(servicer, server):
           request_deserializer=alameda__api_dot_v1alpha1_dot_datahub_dot_server__pb2.WriteRawdataRequest.FromString,
           response_serializer=google_dot_rpc_dot_status__pb2.Status.SerializeToString,
       ),
+      'Ping': grpc.unary_unary_rpc_method_handler(
+          servicer.Ping,
+          request_deserializer=google_dot_protobuf_dot_empty__pb2.Empty.FromString,
+          response_serializer=google_dot_rpc_dot_status__pb2.Status.SerializeToString,
+      ),
       'ListWeaveScopeHosts': grpc.unary_unary_rpc_method_handler(
           servicer.ListWeaveScopeHosts,
           request_deserializer=alameda__api_dot_v1alpha1_dot_datahub_dot_server__pb2.ListWeaveScopeHostsRequest.FromString,
@@ -603,6 +645,16 @@ def add_DatahubServiceServicer_to_server(servicer, server):
           servicer.GetWeaveScopeContainerDetails,
           request_deserializer=alameda__api_dot_v1alpha1_dot_datahub_dot_server__pb2.ListWeaveScopeContainersRequest.FromString,
           response_serializer=alameda__api_dot_v1alpha1_dot_datahub_dot_server__pb2.WeaveScopeResponse.SerializeToString,
+      ),
+      'CreateEvents': grpc.unary_unary_rpc_method_handler(
+          servicer.CreateEvents,
+          request_deserializer=alameda__api_dot_v1alpha1_dot_datahub_dot_server__pb2.CreateEventsRequest.FromString,
+          response_serializer=google_dot_rpc_dot_status__pb2.Status.SerializeToString,
+      ),
+      'ListEvents': grpc.unary_unary_rpc_method_handler(
+          servicer.ListEvents,
+          request_deserializer=alameda__api_dot_v1alpha1_dot_datahub_dot_server__pb2.ListEventsRequest.FromString,
+          response_serializer=alameda__api_dot_v1alpha1_dot_datahub_dot_server__pb2.ListEventsResponse.SerializeToString,
       ),
   }
   generic_handler = grpc.method_handlers_generic_handler(

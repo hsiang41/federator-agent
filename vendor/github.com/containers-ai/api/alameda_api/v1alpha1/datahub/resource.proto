@@ -60,6 +60,7 @@ message Node {
     string name = 1;
     Capacity capacity = 2;
     google.protobuf.Timestamp start_time = 3;
+    Provider provider = 4;
 }
 
 /**
@@ -71,6 +72,7 @@ enum Kind {
     DEPLOYMENT = 1;
     DEPLOYMENTCONFIG = 2;
     ALAMEDASCALER = 3;
+    STATEFULSET = 4;
 }
 
 /**
@@ -91,7 +93,15 @@ message ResourceInfo {
 message Controller {
     ResourceInfo controller_info         = 1;
     repeated ResourceInfo owner_info     = 2;
-    int32 Replicas                       = 3;
+    int32 replicas                       = 3;
     bool enable_recommendation_execution = 4;
     RecommendationPolicy policy          = 5;
+    int32 spec_replicas                  = 6;
+}
+
+message Provider {
+    string provider      = 1;
+    string instance_type = 2;
+    string region        = 3;
+    string zone          = 4;
 }

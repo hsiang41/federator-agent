@@ -5,18 +5,18 @@ import (
 	"errors"
 	"fmt"
 	Common "github.com/containers-ai/api/common"
-	InfluxDBClient "github.com/influxdata/influxdb/client/v2"
+	Client "github.com/influxdata/influxdb/client/v2"
 	"strconv"
 	"time"
 )
 
 func ReadRawdata(config *Config, queries []*Common.Query) ([]*Common.ReadRawdata, error) {
-	influxClient := New(config)
+	influxClient := NewClient(config)
 	rawdata := make([]*Common.ReadRawdata, 0)
 
 	for _, query := range queries {
-		statement := NewInfluxStatement(query)
-		statement.AppendTimeConditionIntoWhereClause()
+		statement := NewStatement(query)
+		statement.AppendWhereClauseFromTimeCondition()
 		statement.SetLimitClauseFromQueryCondition()
 		statement.SetOrderClauseFromQueryCondition()
 		cmd := statement.BuildQueryCmd()
@@ -36,10 +36,10 @@ func ReadRawdata(config *Config, queries []*Common.Query) ([]*Common.ReadRawdata
 }
 
 func WriteRawdata(config *Config, writeRawdata []*Common.WriteRawdata) error {
-	influxClient := New(config)
+	influxClient := NewClient(config)
 
 	for _, rawdata := range writeRawdata {
-		points := make([]*InfluxDBClient.Point, 0)
+		points := make([]*Client.Point, 0)
 
 		for _, row := range rawdata.GetRows() {
 			index := 0
@@ -60,14 +60,14 @@ func WriteRawdata(config *Config, writeRawdata []*Common.WriteRawdata) error {
 
 			// Add time field depends on request
 			if row.GetTime() == nil {
-				pt, err := InfluxDBClient.NewPoint(rawdata.GetTable(), tags, fields, time.Unix(0, 0))
+				pt, err := Client.NewPoint(rawdata.GetTable(), tags, fields, time.Unix(0, 0))
 				if err == nil {
 					points = append(points, pt)
 				} else {
 					fmt.Println(err.Error())
 				}
 			} else {
-				pt, err := InfluxDBClient.NewPoint(rawdata.GetTable(), tags, fields, time.Unix(row.GetTime().GetSeconds(), 0))
+				pt, err := Client.NewPoint(rawdata.GetTable(), tags, fields, time.Unix(row.GetTime().GetSeconds(), 0))
 				if err == nil {
 					points = append(points, pt)
 				} else {
@@ -76,7 +76,7 @@ func WriteRawdata(config *Config, writeRawdata []*Common.WriteRawdata) error {
 			}
 		}
 
-		err := influxClient.WritePoints(points, InfluxDBClient.BatchPointsConfig{Database: rawdata.GetDatabase()})
+		err := influxClient.WritePoints(points, Client.BatchPointsConfig{Database: rawdata.GetDatabase()})
 		if err != nil {
 			scope.Error(err.Error())
 		}
@@ -87,7 +87,7 @@ func WriteRawdata(config *Config, writeRawdata []*Common.WriteRawdata) error {
 	return nil
 }
 
-func InfluxResultToReadRawdata(results []InfluxDBClient.Result, query *Common.Query) *Common.ReadRawdata {
+func InfluxResultToReadRawdata(results []Client.Result, query *Common.Query) *Common.ReadRawdata {
 	readRawdata := Common.ReadRawdata{Query: query}
 
 	if len(results[0].Series) == 0 {
@@ -149,8 +149,8 @@ func InfluxResultToReadRawdata(results []InfluxDBClient.Result, query *Common.Qu
 	return &readRawdata
 }
 
-func ReadRawdataToInfluxDBRow(readRawdata *Common.ReadRawdata) []*InfluxDBRow {
-	influxDBRows := make([]*InfluxDBRow, 0)
+func ReadRawdataToInfluxDBRow(readRawdata *Common.ReadRawdata) []*InfluxRow {
+	influxDBRows := make([]*InfluxRow, 0)
 
 	tagIndex := make([]int, 0)
 
@@ -164,7 +164,7 @@ func ReadRawdataToInfluxDBRow(readRawdata *Common.ReadRawdata) []*InfluxDBRow {
 	}
 
 	for _, group := range readRawdata.GetGroups() {
-		influxDBRow := InfluxDBRow{
+		influxDBRow := InfluxRow{
 			Name: readRawdata.GetQuery().GetTable(),
 			Tags: make(map[string]string),
 		}
@@ -191,7 +191,7 @@ func ReadRawdataToInfluxDBRow(readRawdata *Common.ReadRawdata) []*InfluxDBRow {
 	return influxDBRows
 }
 
-func CompareRawdataWithInfluxResults(readRawdata *Common.ReadRawdata, results []InfluxDBClient.Result) error {
+func CompareRawdataWithInfluxResults(readRawdata *Common.ReadRawdata, results []Client.Result) error {
 	before := PackMap(results)
 	after := ReadRawdataToInfluxDBRow(readRawdata)
 	message := ""

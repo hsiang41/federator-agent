@@ -1,9 +1,8 @@
 package influxdb
 
 import (
-	"net/url"
-
 	"github.com/pkg/errors"
+	"net/url"
 )
 
 const (
@@ -14,6 +13,7 @@ const (
 	defaultRetentionShardDuration = "1d"
 )
 
+// Configuration of InfluxDB data source
 type Config struct {
 	Address                string `mapstructure:"address"`
 	Username               string `mapstructure:"username"`
@@ -22,7 +22,8 @@ type Config struct {
 	RetentionShardDuration string `mapstructure:"retentionShardDuration"`
 }
 
-func NewDefaultConfig() Config {
+// Provide default configuration for InfluxDB
+func NewDefaultConfig() *Config {
 	var config = Config{
 		Address:                defaultAddress,
 		Username:               defaultUsername,
@@ -30,14 +31,14 @@ func NewDefaultConfig() Config {
 		RetentionDuration:      defaultRetentionDuration,
 		RetentionShardDuration: defaultRetentionShardDuration,
 	}
-	return config
+	return &config
 }
 
+// Confirm the InfluxDB configuration is validated
 func (c *Config) Validate() error {
 	_, err := url.Parse(c.Address)
 	if err != nil {
-		return errors.New("InfluxDB config validate failed: " + err.Error())
+		return errors.New("failed to validate InfluxDB configuration: " + err.Error())
 	}
-
 	return nil
 }
