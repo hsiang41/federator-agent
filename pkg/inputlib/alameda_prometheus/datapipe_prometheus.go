@@ -143,6 +143,8 @@ func (i inputLib) Gather() error {
 				gDClient.Scope.Errorf(fmt.Sprintf("failed to covert data for write raw data %s, %v", m.Name, err))
 				continue
 			}
+			data, err := json.Marshal(rawWriteData)
+			gDClient.Scope.Debugf(fmt.Sprintf("measurement: %s, rawWriteData: %s", m.Name, string(data)))
 			err = gDClient.DataPipeClient.WriteRawData(rawWriteData)
 			if err != nil{
 				gDClient.Scope.Errorf(fmt.Sprintf("failed to write raw data %s, %v", m.Name, err))

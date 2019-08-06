@@ -54,49 +54,49 @@ data:
     expr = "apiserver_request_count"
     tags = ["client", "code", "instance", "namespace", "resource", "scope", "verb"]
     [measurement.element.value]
-    type = "int"            # <element.<Tag/Field> is prometheus label name, type define "int/float/string<default: string>"
+    type = "float"            # <element.<Tag/Field> is prometheus label name, type define "int/float/string<default: string>"
 
     [[measurement]]
     name = "kube_pod_container_status_restarts_total"
     expr = "kube_pod_container_status_restarts_total"
     tags = ["container", "instance", "namespace", "pod"]
     [measurement.element.value]
-    type = "int"
+    type = "float"
 
     [[measurement]]
     name = "kube_node_spec_unschedulable"
     expr = "kube_node_spec_unschedulable"
     tags = ["instance", "namespace", "node", "pod"]
     [measurement.element.value]
-    type = "int"
+    type = "float"
 
     [[measurement]]
     name = "kube_node_spec_unschedulable"
     expr = "kube_node_spec_unschedulable"
     tags = ["instance", "namespace", "node", "pod"]
     [measurement.element.value]
-    type = "int"
+    type = "float"
 
     [[measurement]]
     name = "kube_node_status_capacity_cpu_cores"
     expr = "kube_node_status_capacity_cpu_cores"
     tags = ["instance", "namespace", "node", "pod"]
     [measurement.element.value]
-    type = "int"
+    type = "float"
 
     [[measurement]]
     name = "kube_node_status_capacity_memory_bytes"
     expr = "kube_node_status_capacity_memory_bytes"
     tags = ["instance", "namespace", "node", "pod"]
     [measurement.element.value]
-    type = "int"
+    type = "float"
 
     [[measurement]]
     name = "kube_pod_container_resource_requests_cpu_cores"
     expr = "kube_pod_container_resource_requests_cpu_cores"
     tags = ["container", "instance", "namespace", "node", "pod"]
     [measurement.element.value]
-    type = "int"
+    type = "float"
 
     [[measurement]]
     name = "kube_pod_container_resource_limits_cpu_cores"
@@ -110,69 +110,69 @@ data:
     expr = "kube_pod_container_resource_requests_memory_bytes"
     tags = ["container", "instance", "namespace", "node", "pod"]
     [measurement.element.value]
-    type = "int"
+    type = "float"
 
     [[measurement]]
     name = "kube_pod_container_resource_limits_memory_bytes"
     expr = "kube_pod_container_resource_limits_memory_bytes"
     tags = ["container", "instance", "namespace", "node", "pod"]
     [measurement.element.value]
-    type = "int"
+    type = "float"
 
     [[measurement]]
     name = ":kube_pod_info_node_count:"
     expr = ":kube_pod_info_node_count:"
     [measurement.element.value]
-    type = "int"
+    type = "float"
 
     [[measurement]]
     name = "node:node_cpu_utilisation:avg1m"
     expr = "node:node_cpu_utilisation:avg1m"
     tags = ["node"]
     [measurement.element.value]
-    type = "int"
+    type = "float"
 
     [[measurement]]
     name = "node:node_num_cpu:sum"
     expr = "node:node_num_cpu:sum"
     tags = ["node"]
     [measurement.element.value]
-    type = "int"
+    type = "float"
 
     [[measurement]]
     name = "node:node_memory_utilisation:ratio"
     expr = "node:node_memory_utilisation:ratio"
     tags = ["node"]
     [measurement.element.value]
-    type = "int"
+    type = "float"
 
     [[measurement]]
     name = "node:node_memory_utilisation:"
     expr = "node:node_memory_utilisation:"
     tags = ["node"]
     [measurement.element.value]
-    type = "int"
+    type = "float"
 
     [[measurement]]
     name = "node_filesystem_size_bytes"
     expr = "node_filesystem_size_bytes"
     tags = ["device", "fstype", "instance", "mountpoint", "namespace", "pod"]
     [measurement.element.value]
-    type = "int"
+    type = "float"
 
     [[measurement]] # 18
     name = "node_filesystem_avail_bytes"
     expr = "node_filesystem_avail_bytes"
     tags = ["device", "fstype", "instance", "mountpoint", "namespace", "pod"]
     [measurement.element.value]
-    type = "int"
+    type = "float"
 
     [[measurement]] # 19
     name = "node_namespace_pod:kube_pod_info:"
     expr = "node_namespace_pod:kube_pod_info:"
     tags = ["namespace", "node", "pod"]
     [measurement.element.value]
-    type = "int"
+    type = "float"
 
     [[measurement]] # 20
     name = "node:node_disk_utilisation:avg_irate"
@@ -186,13 +186,13 @@ data:
     expr = "kube_node_labels"
     tags = ["instance", "label_kubernetes_io_hostname", "namespace", "node", "pod"]
     [measurement.element.value]
-    type = "int"
+    type = "float"
 
     [[measurement]] # 101
     name = "cmd_api_server_up"
     expr = "(sum(up{job=~\".*apiserver.*\"} == 1) / count(up{job=~\".*apiserver.*\"}))"
     [measurement.element.value]
-    type = "int"
+    type = "float"
 
     [[measurement]] # 102
     name = "cmd_api_server_request_error_rates"
@@ -205,25 +205,25 @@ data:
     name = "cmd_crashing_control_plane_pods"
     expr = "count(increase(kube_pod_container_status_restarts_total{namespace=~\"kube-system\"}[1h]) > 5)"
     [measurement.element.value]
-    type = "int"
+    type = "float"
 
     [[measurement]] # 104
     name = "cmd_crashing_pods"
     expr = "count(increase(kube_pod_container_status_restarts_total[1h]) > 5)"
     [measurement.element.value]
-    type = "int"
+    type = "float"
 
     [[measurement]] # 107
     name = "cmd_nodes_up"
     expr = "(sum(up{job=\"kubelet\"} == 1) / count(up{job=\"kubelet\"}))"
     [measurement.element.value]
-    type = "int"
+    type = "float"
 
     [[measurement]] # 110
     name = "cmd_nodes_unschedulable"
     expr = "sum(kube_node_spec_unschedulable) / count(up{job=\"kubelet\"})"
     [measurement.element.value]
-    type = "int"
+    type = "float"
 
     [[measurement]] # 111
     name = "cmd_cpu_utilisation"
@@ -258,14 +258,14 @@ data:
     expr = "topk(5, sum(container_memory_usage_bytes{image!=\"\"} * on (namespace, pod_name) group_left (node) label_replace(node_namespace_pod:kube_pod_info:{node=\"$node\"}, \"pod_name\", \"$1\", \"pod\", \"(.*)\"))  by (pod_name))"
     tags = ["node", "pod_name"]
     [measurement.element.value]
-    type = "int"
+    type = "float"
 
     [[measurement]] # 121
     name = "cmd_pods_running_status_count"
     expr = "sum(kube_pod_status_phase * on (namespace, pod) group_left (node) node_namespace_pod:kube_pod_info:{node=\"$node\"} ) by (phase)"
     tags = ["node", "phase"]
     [measurement.element.value]
-    type = "int"
+    type = "float"
 
     [[measurement]] # 122
     name = "cmd_current_running_pods-cpu_usage"
@@ -293,28 +293,28 @@ data:
     expr = "sum(container_memory_usage_bytes{container_name!=\"POD\", container_name!=\"\"} * on (namespace, pod_name) group_left (node) label_replace(node_namespace_pod:kube_pod_info:{node=\"$node\"}, \"pod_name\", \"$1\", \"pod\", \"(.*)\") ) by (pod_name)"
     tags = ["node", "pod_name"]
     [measurement.element.value]
-    type = "int"
+    type = "float"
 
     [[measurement]] # 126
     name = "cmd_current_running_pods-mem_request"
     expr = "sum(label_replace(label_replace(sum(avg_over_time(kube_pod_container_resource_requests_memory_bytes{container!=\"\",container!=\"POD\",node=\"$node\"}[10m])) by (pod),\"container_name\",\"$1\",\"container\",\"(.+)\"), \"pod_name\",\"$1\",\"pod\",\"(.+)\") or up * 0) by (pod_name)"
     tags = ["node", "pod_name"]
     [measurement.element.value]
-    type = "int"
+    type = "float"
 
     [[measurement]] # 127
     name = "cmd_current_running_pods-mem_limit"
     expr = "sum(label_replace(label_replace( sum(avg_over_time(kube_pod_container_resource_limits_memory_bytes{container!=\"\",container!=\"POD\",node=\"$node\"}[10m])) by (pod), \"container_name\",\"$1\",\"container\",\"(.+)\"), \"pod_name\",\"$1\",\"pod\",\"(.+)\") or up * 0) by (pod_name)"
     tags = ["node", "pod_name"]
     [measurement.element.value]
-    type = "int"
+    type = "float"
 
     [[measurement]] # 128
     name = "cmd_current_running_pods-restart_time"
     expr = "sum(label_replace(kube_pod_container_status_restarts_total{container!=\"\",container!=\"POD\",pod !=\"\"}, \"pod_name\", \"$1\", \"pod\", \"(.*)\") * on (namespace, pod) group_left (node) node_namespace_pod:kube_pod_info:{node=\"$node\"}) by (pod_name)"
     tags = ["node", "pod_name"]
     [measurement.element.value]
-    type = "int"
+    type = "float"
 
 ---
 
