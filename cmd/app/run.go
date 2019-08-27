@@ -57,6 +57,10 @@ func ReadConfig(filename string) (*Agent.Config, error) {
 	if err != nil {
 		panic(errors.New("Unmarshal configuration failed: " + err.Error()))
 	} else {
+		logLev, ok := log.StringToLevel(agentConfig.Log.OutputLevel)
+		fmt.Println(logger, ok, agentConfig.Log.OutputLevel)
+		logger.SetOutputLevel(logLev)
+		fmt.Println("Set debug level")
 		if transmitterConfBin, err := json.MarshalIndent(agentConfig, "", "  "); err == nil {
 			logger.Debug(fmt.Sprintf("Transmitter configuration: %s", string(transmitterConfBin)))
 		}
@@ -105,7 +109,7 @@ func (s ScheduleJob) Run() {
 		var libObj InputLib.InputLibrary
 		libObj, ok := libName.(InputLib.InputLibrary)
 		if !ok {
-			logger.Errorf(fmt.Sprintf("Failed to load input library object: %v", err))
+			logger.Errorf(fmt.Sprintf("Failed to load input library object: %v", ok))
 			return
 		}
 
@@ -116,7 +120,7 @@ func (s ScheduleJob) Run() {
 		var libObj OutputLib.OutputLibrary
 		libObj, ok := libName.(OutputLib.OutputLibrary)
 		if !ok {
-			logger.Errorf(fmt.Sprintf("Failed to load output library object: %v", err))
+			logger.Errorf(fmt.Sprintf("Failed to load output library object: %v", ok))
 			return
 		}
 
@@ -133,12 +137,9 @@ func startAgent() {
 		return
 	}
 	initQueue()
-	logger.SetLogCallers(agentConfig.Log.SetLogCallers)
+	logger.SetLogCallers(agentConfig.Log.SetLogCaller)
 	if outputLvl, ok := log.StringToLevel(agentConfig.Log.OutputLevel); ok {
 		logger.SetOutputLevel(outputLvl)
-	}
-	if stacktraceLevel, ok := log.StringToLevel(agentConfig.Log.StackTraceLevel); ok {
-		logger.SetStackTraceLevel(stacktraceLevel)
 	}
 
 	logger.Debug(fmt.Sprintf("input: %v", agentConfig.InputJobs))
@@ -151,6 +152,7 @@ func startAgent() {
 		c.AddFunc(v.ScheduledTaskSpec, func() {
 			logger.Debug(fmt.Sprintf("Start cron input job: %v", v))
 		})
+		go ScheduleJob{v.LibPath, v.LibConfiguration, LibTypeInput}.Run()
 		c.AddJob(v.ScheduledTaskSpec, ScheduleJob{v.LibPath, v.LibConfiguration, LibTypeInput})
 	}
 
@@ -163,6 +165,7 @@ func startAgent() {
 	}
 
 	c.Start()
+	c.Entries()
 	defer c.Stop()
 	select {}
 }

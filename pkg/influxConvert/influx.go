@@ -1,9 +1,10 @@
 package InfluxConvert
 
 import (
-	"github.com/containers-ai/api/datapipe/rawdata"
-	"github.com/containers-ai/api/common"
+	"fmt"
 	"strings"
+	v1alpha1 "github.com/containers-ai/api/alameda_api/v1alpha1/datahub"
+	"github.com/containers-ai/api/common"
 )
 
 type InfluxField struct {
@@ -13,11 +14,11 @@ type InfluxField struct {
 }
 
 type Influx struct {
-	DatabaseName string
+	DatabaseName    string
 	MeasurementName string
-	TagKeys []string
-	FieldKeys []*InfluxField
-	sourceData *rawdata.ReadRawdataResponse
+	TagKeys         []string
+	FieldKeys       []*InfluxField
+	SourceData      interface{}
 }
 
 func StringToDataType(strDataType string) common.DataType {
@@ -32,11 +33,11 @@ func StringToDataType(strDataType string) common.DataType {
 	}
 }
 
-func NewInflux(databaseName string, measurementName string, tags []string, fields []*InfluxField, sourceData *rawdata.ReadRawdataResponse) *Influx {
+func NewInflux(databaseName string, measurementName string, tags []string, fields []*InfluxField, sourceData interface{}) *Influx {
 	return &Influx{
-		DatabaseName: databaseName,
+		DatabaseName:    databaseName,
 		MeasurementName: measurementName,
-		TagKeys: tags, FieldKeys: fields, sourceData: sourceData}
+		TagKeys:         tags, FieldKeys: fields, SourceData: sourceData}
 }
 
 func (n *Influx)isTagKey(keyName string) bool {
@@ -60,11 +61,27 @@ func (n *Influx)getFieldKey(keyName string) *InfluxField {
 	return nil
 }
 
-func (n *Influx)GetWriteRequest() (*rawdata.WriteRawdataRequest, error) {
-	var wrRawData rawdata.WriteRawdataRequest
+
+func (n *Influx)GetWriteRequest() (*v1alpha1.WriteRawdataRequest, error) {
+	var wrRawData v1alpha1.WriteRawdataRequest
 	var rawDatas []*common.WriteRawdata
+
+	defer func() {
+		if err := recover(); err != nil {
+			fmt.Println(err)
+		}
+		fmt.Println("d")
+	}()
+	func () {
+		defer func() {
+			fmt.Println("defer here")
+		}()
+	}()
+
 	wrRawData.DatabaseType = common.DatabaseType_INFLUXDB
-    for _, v := range n.sourceData.GetRawdata() {
+	souceData := n.SourceData.(*v1alpha1.ReadRawdataResponse).GetRawdata()
+
+    for _, v := range souceData {
 		var rawData common.WriteRawdata
 	    var metricColumnsTypes []common.ColumnType
 	    var metricDataTypes []common.DataType

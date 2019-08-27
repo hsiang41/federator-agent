@@ -6,6 +6,7 @@ import (
 	CommonLib "github.com/containers-ai/api/common"
 	"time"
 	"fmt"
+	"encoding/json"
 )
 
 func GetTimeRange(startTime *timestamp.Timestamp, endTime *timestamp.Timestamp, durationTime int32, isInit bool, step int32) *CommonLib.TimeRange {
@@ -31,4 +32,22 @@ func GetTimeRange(startTime *timestamp.Timestamp, endTime *timestamp.Timestamp, 
 	du := ptypes.DurationProto(duTime)
 
 	return &CommonLib.TimeRange{StartTime:startTime, EndTime:endTime, Step: du, AggregateFunction: 0}
+}
+
+func InterfaceToString(i interface{}, params ...string) string {
+	var indent string
+	var err error
+	var v []byte
+	if params != nil && len(params) > 0 {
+		indent = params[0]
+	}
+	if len(indent) > 0 {
+		v, err = json.MarshalIndent(i, "", indent)
+	} else {
+		v, err = json.Marshal(i)
+	}
+	if err != nil {
+		return ""
+	}
+	return string(v)
 }

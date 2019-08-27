@@ -27,11 +27,11 @@
 
 [[constraint]]
   name = "github.com/containers-ai/alameda"
-  branch = "development"
+  branch = "master"
 
 [[constraint]]
   name = "github.com/containers-ai/api"
-  branch = "development"
+  branch = "master"
   source = "https://github.com/containers-ai/api.git"
 
 [prune]

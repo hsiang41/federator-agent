@@ -1,24 +1,22 @@
 [log]
- set-logcallers = true
+ set-logcallers = false
  output-level = "debug" # debug, info, warn, error, fatal, none
 
 [input_jobs]
-    [input_jobs.datapipe_input]
-    name = "datapipe_input"
-    schedule-spec = "*/5 * * * * ?"
-    lib-path = "/lib/inputlib/datapipe.so"
-    lib-configuration = "/etc/alameda/federatorai-agent/input/datapipe.toml"
+    [input_jobs.cost_analysis_daily]
+    name = "cost_analysis_daily"
+    schedule-spec = "@every 1 hour"
+    lib-path = "/lib/inputlib/costanalysis.so"
+    lib-configuration = "/etc/alameda/federatorai-agent/input/cost_analysis_daily.toml"
 
-    [input_jobs.datapipe_prometheus]
-    name = "datapipe_prometheus"
-    schedule-spec = "*/30 * * * * ?"
-    lib-path = "/lib/inputlib/datapipe_prometheus.so"
-    lib-configuration = "/etc/alameda/federatorai-agent/input/datapipe_prometheus.toml"
+    [input_jobs.cost_analysis_weekly]
+    name = "cost_analysis_daily"
+    schedule-spec = "@every 6 hour"
+    lib-path = "/lib/inputlib/costanalysis.so"
+    lib-configuration = "/etc/alameda/federatorai-agent/input/cost_analysis_weekly.toml"
 
-[output_jobs]
-    [output_jobs.datapipe_output]
-    name = "datapipe_output"
-    schedule-spec = "*/30 * * * * ?"
-    lib-path = "/lib/outputlib/datapipe_recommender.so"
-    lib-configuration = "/etc/alameda/federatorai-agent/output/datapipe.toml"
-
+    [input_jobs.cost_analysis_monthly]
+    name = "cost_analysis_daily"
+    schedule-spec = "@every 1 day"
+    lib-path = "/lib/inputlib/costanalysis.so"
+    lib-configuration = "/etc/alameda/federatorai-agent/input/cost_analysis_monthly.toml"

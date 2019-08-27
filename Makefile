@@ -35,6 +35,10 @@ lib:
 	CGO_ENABLED=1 GOOS=linux GOARCH=amd64 go build -buildmode=plugin \
 	  -a -o ./lib/outputlib/datapipe_recommender.so github.com/containers-ai/federatorai-agent/pkg/outputlib/alameda_recommender
 
+lib_fedemeter:
+	CGO_ENABLED=1 GOOS=linux GOARCH=amd64 go build -buildmode=plugin \
+	  -a -o ./lib/inputlib/costanalysis.so github.com/containers-ai/federatorai-agent/pkg/inputlib/alameda_fedemeter
+
 binaries:
 	GOOS=linux GOARCH=amd64 go build \
 	  -ldflags "-X main.VERSION=`git rev-parse --abbrev-ref HEAD`-`git rev-parse --short HEAD``git diff --quiet || echo '-dirty'` -X 'main.BUILD_TIME=`date`' -X 'main.GO_VERSION=`go version`'" \
@@ -62,6 +66,20 @@ install: install_dir
 	cp -fv $(SRC_DIR)/init.sh $(INSTALL_ROOT)/init.sh && chmod 755 $(INSTALL_ROOT)/init.sh
 	cd $(INSTALL_ROOT); tar -czvf $(SRC_DIR)/install_root.tgz .; cd -
 
+install_fedemeter: install_dir
+	cp -fv etc/transmitter.toml $(DEST_PREFIX)/etc/transmitter.toml
+	cp -fv etc/input/cost_analysis_daily.toml $(DEST_PREFIX)/etc/input/const_analysis_daily.toml
+	cp -fv etc/input/cost_analysis_weekly.toml $(DEST_PREFIX)/etc/input/const_analysis_weekly.toml
+	cp -fv etc/input/cost_analysis_monthly.toml $(DEST_PREFIX)/etc/input/const_analysis_monthly.toml
+	cp -fv lib/inputlib/costanalysis.so $(INSTALL_ROOT)/lib/inputlib/costanalysis.so
+	cp -fv transmitter/transmitter $(DEST_PREFIX)/bin/
+	# logrotate.conf
+	cp -fv $(SRC_DIR)/logrotate.conf $(DEST_PREFIX)/etc/
+	ln -sfv $(PRODUCT_ROOT)/etc/logrotate.conf $(INSTALL_ROOT)/etc/logrotate.d/federatorai-agent
+	# init.sh
+	cp -fv $(SRC_DIR)/init.sh $(INSTALL_ROOT)/init.sh && chmod 755 $(INSTALL_ROOT)/init.sh
+	cd $(INSTALL_ROOT); tar -czvf $(SRC_DIR)/install_root.tgz .; cd -
+
 clean:
 	rm -fv ./transmitter/transmitter install_root.tgz *~
 
@@ -69,6 +87,8 @@ clobber: clean
 	rm -rf install_root
 
 build: all lib binaries install
+
+build_fedemeter: lib_fedemeter binaries install_fedemeter
 
 .PHONY: run lib binaries
 
@@ -97,4 +117,9 @@ docker-build-alpine:
 docker-build-ubi:
 	docker build -t ${IMG} -f Dockerfile.ubi .
 
+docker-build-ubi-fedemeter:
+	docker build -t ${IMG} -f Dockerfile.ubi.fedemeter .
+
 docker-build: docker-build-ubi
+
+docker-build-fedemeter: docker-build-ubi-fedemeter

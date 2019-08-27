@@ -1,3 +1,7 @@
+/*
+Kubernetes customer resource writer
+ */
+
 package crwriter
 
 import (

@@ -3,6 +3,7 @@ package InfluxConvert
 import (
 	"testing"
 	"github.com/containers-ai/api/datapipe/rawdata"
+	v1alpha1 "github.com/containers-ai/api/alameda_api/v1alpha1/datahub"
 	"encoding/json"
 	"fmt"
 	"github.com/containers-ai/api/common"
@@ -26,7 +27,7 @@ func TestGetWriteRequest(t *testing.T) {
 }
 
 func TestGetWriteRequest_KubePodContainerStatusRestartsTotal(t *testing.T) {
-	var rawResponse rawdata.ReadRawdataResponse
+	var rawResponse v1alpha1.ReadRawdataResponse
 	var fields []*InfluxField
 	tags := []string {"container", "instance", "namespace", "pod"}
 	err := json.Unmarshal([]byte(kubePodContainerStatusRestartsTotal), &rawResponse)

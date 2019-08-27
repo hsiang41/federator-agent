@@ -1,0 +1,652 @@
+apiVersion: v1
+items:
+- apiVersion: v1
+  kind: Node
+  metadata:
+    annotations:
+      flannel.alpha.coreos.com/backend-data: '{"VtepMAC":"46:ff:9d:7a:85:aa"}'
+      flannel.alpha.coreos.com/backend-type: vxlan
+      flannel.alpha.coreos.com/kube-subnet-manager: "true"
+      flannel.alpha.coreos.com/public-ip: 172.23.1.112
+      kubeadm.alpha.kubernetes.io/cri-socket: /var/run/dockershim.sock
+      node.alpha.kubernetes.io/ttl: "0"
+      volumes.kubernetes.io/controller-managed-attach-detach: "true"
+    creationTimestamp: "2019-08-15T09:42:38Z"
+    labels:
+      beta.kubernetes.io/arch: amd64
+      beta.kubernetes.io/instance-type: t2.medium
+      beta.kubernetes.io/os: linux
+      failure-domain.beta.kubernetes.io/region: us-west-2
+      failure-domain.beta.kubernetes.io/zone: us-west-2a
+      kubernetes.io/arch: amd64
+      kubernetes.io/hostname: ip-172-23-1-112.us-west-2.compute.internal
+      kubernetes.io/os: linux
+      node-role.kubernetes.io/master: ""
+      stackpoint.io/cluster_id: "23391"
+      stackpoint.io/instance_id: netatt9dgn-master-1
+      stackpoint.io/node_group: ""
+      stackpoint.io/node_id: "91190"
+      stackpoint.io/node_pool: ""
+      stackpoint.io/private_ip: 172.23.1.112
+      stackpoint.io/role: master
+      stackpoint.io/size: t2.medium
+    name: ip-172-23-1-112.us-west-2.compute.internal
+    resourceVersion: "673755"
+    selfLink: /api/v1/nodes/ip-172-23-1-112.us-west-2.compute.internal
+    uid: ffc8c3f2-f9f6-4303-aa72-2b72fe816e2b
+  spec:
+    podCIDR: 10.2.0.0/24
+    providerID: aws:///us-west-2a/i-0769ec8570198bf4b
+    taints:
+    - effect: NoSchedule
+      key: node-role.kubernetes.io/master
+  status:
+    addresses:
+    - address: 172.23.1.112
+      type: InternalIP
+    - address: 54.218.143.157
+      type: ExternalIP
+    - address: ip-172-23-1-112.us-west-2.compute.internal
+      type: InternalDNS
+    - address: ip-172-23-1-112.us-west-2.compute.internal
+      type: Hostname
+    allocatable:
+      attachable-volumes-aws-ebs: "39"
+      cpu: "2"
+      ephemeral-storage: "46779129369"
+      hugepages-2Mi: "0"
+      memory: 3935768Ki
+      pods: "110"
+    capacity:
+      attachable-volumes-aws-ebs: "39"
+      cpu: "2"
+      ephemeral-storage: 50758604Ki
+      hugepages-2Mi: "0"
+      memory: 4038168Ki
+      pods: "110"
+    conditions:
+    - lastHeartbeatTime: "2019-08-20T06:05:36Z"
+      lastTransitionTime: "2019-08-15T09:42:38Z"
+      message: kubelet has sufficient memory available
+      reason: KubeletHasSufficientMemory
+      status: "False"
+      type: MemoryPressure
+    - lastHeartbeatTime: "2019-08-20T06:05:36Z"
+      lastTransitionTime: "2019-08-15T09:42:38Z"
+      message: kubelet has no disk pressure
+      reason: KubeletHasNoDiskPressure
+      status: "False"
+      type: DiskPressure
+    - lastHeartbeatTime: "2019-08-20T06:05:36Z"
+      lastTransitionTime: "2019-08-15T09:42:38Z"
+      message: kubelet has sufficient PID available
+      reason: KubeletHasSufficientPID
+      status: "False"
+      type: PIDPressure
+    - lastHeartbeatTime: "2019-08-20T06:05:36Z"
+      lastTransitionTime: "2019-08-15T09:43:18Z"
+      message: kubelet is posting ready status. AppArmor enabled
+      reason: KubeletReady
+      status: "True"
+      type: Ready
+    daemonEndpoints:
+      kubeletEndpoint:
+        Port: 10250
+    images:
+    - names:
+      - k8s.gcr.io/etcd@sha256:17da501f5d2a675be46040422a27b7cc21b8a43895ac998b171db1c346f361f7
+      - k8s.gcr.io/etcd:3.3.10
+      sizeBytes: 258116302
+    - names:
+      - k8s.gcr.io/kube-apiserver@sha256:5fae387bacf1def6c3915b4a3035cf8c8a4d06158b2e676721776d3d4afc05a2
+      - k8s.gcr.io/kube-apiserver:v1.15.2
+      sizeBytes: 206823358
+    - names:
+      - k8s.gcr.io/kube-controller-manager@sha256:7d3fc48cf83aa0a7b8f129fa4255bb5530908e1a5b194be269ea8329b48e9598
+      - k8s.gcr.io/kube-controller-manager:v1.15.2
+      sizeBytes: 158718526
+    - names:
+      - nginx@sha256:5411d8897c3da841a1f45f895b43ad4526eb62d3393c3287124a56be49962d41
+      - nginx:latest
+      sizeBytes: 125850912
+    - names:
+      - k8s.gcr.io/kube-proxy@sha256:626f983f25f8b7799ca7ab001fd0985a72c2643c0acb877d2888c0aa4fcbdf56
+      - k8s.gcr.io/kube-proxy:v1.15.2
+      sizeBytes: 82408284
+    - names:
+      - k8s.gcr.io/kube-scheduler@sha256:8fd3c3251f07234a234469e201900e4274726f1fe0d5dc6fb7da911f1c851a1a
+      - k8s.gcr.io/kube-scheduler:v1.15.2
+      sizeBytes: 81107582
+    - names:
+      - quay.io/coreos/flannel@sha256:88f2b4d96fae34bfff3d46293f7f18d1f9f3ca026b4a4d288f28347fcb6580ac
+      - quay.io/coreos/flannel:v0.10.0-amd64
+      sizeBytes: 44598861
+    - names:
+      - k8s.gcr.io/coredns@sha256:02382353821b12c21b062c59184e227e001079bb13ebd01f9d3270ba0fcbf1e4
+      - k8s.gcr.io/coredns:1.3.1
+      sizeBytes: 40303560
+    - names:
+      - gcr.io/stackpoint-public/stackpoint-bootstrap@sha256:00b9fa51512c94df692aa8271d1d63d2f81c2c2613ede541b34cf9b1d43be2b4
+      - gcr.io/stackpoint-public/stackpoint-bootstrap:v0.1.4
+      sizeBytes: 21627146
+    - names:
+      - quay.io/prometheus/node-exporter@sha256:1b129a3801a0440f9c5b2afb20082dfdb31bf6092b561f5f249531130000cb83
+      - quay.io/prometheus/node-exporter:v0.17.0
+      sizeBytes: 20982005
+    - names:
+      - k8s.gcr.io/pause@sha256:f78411e19d84a252e53bff71a4407a5686c46983a2c2eeed83929b888179acea
+      - k8s.gcr.io/pause:3.1
+      sizeBytes: 742472
+    nodeInfo:
+      architecture: amd64
+      bootID: 6f24faca-8584-49bf-b9f0-063f6dabbe67
+      containerRuntimeVersion: docker://18.9.4
+      kernelVersion: 4.15.0-1044-aws
+      kubeProxyVersion: v1.15.2
+      kubeletVersion: v1.15.2
+      machineID: 8b15f85de03d4f368c07e675e4c32b1e
+      operatingSystem: linux
+      osImage: Ubuntu 18.04.2 LTS
+      systemUUID: EC212DED-1F55-4526-F115-CCACEB7315E0
+- apiVersion: v1
+  kind: Node
+  metadata:
+    annotations:
+      flannel.alpha.coreos.com/backend-data: '{"VtepMAC":"02:46:55:86:87:da"}'
+      flannel.alpha.coreos.com/backend-type: vxlan
+      flannel.alpha.coreos.com/kube-subnet-manager: "true"
+      flannel.alpha.coreos.com/public-ip: 172.23.1.63
+      kubeadm.alpha.kubernetes.io/cri-socket: /var/run/dockershim.sock
+      node.alpha.kubernetes.io/ttl: "0"
+      volumes.kubernetes.io/controller-managed-attach-detach: "true"
+    creationTimestamp: "2019-08-15T09:43:36Z"
+    labels:
+      beta.kubernetes.io/arch: amd64
+      beta.kubernetes.io/instance-type: c4.xlarge
+      beta.kubernetes.io/os: linux
+      failure-domain.beta.kubernetes.io/region: us-west-2
+      failure-domain.beta.kubernetes.io/zone: us-west-2a
+      kubernetes.io/arch: amd64
+      kubernetes.io/hostname: ip-172-23-1-63.us-west-2.compute.internal
+      kubernetes.io/os: linux
+      stackpoint.io/cluster_id: "23391"
+      stackpoint.io/instance_id: netatt9dgn-worker-1
+      stackpoint.io/node_group: autoscaling-netatt9dgn-pool-1
+      stackpoint.io/node_id: "91191"
+      stackpoint.io/node_pool: Default-Worker-Pool
+      stackpoint.io/private_ip: 172.23.1.63
+      stackpoint.io/role: worker
+      stackpoint.io/size: c4.xlarge
+    name: ip-172-23-1-63.us-west-2.compute.internal
+    resourceVersion: "673764"
+    selfLink: /api/v1/nodes/ip-172-23-1-63.us-west-2.compute.internal
+    uid: 385e1a95-9b74-4385-b706-1cd3cfc43a42
+  spec:
+    podCIDR: 10.2.1.0/24
+    providerID: aws:///us-west-2a/i-0364d9b65e9d1f973
+  status:
+    addresses:
+    - address: 172.23.1.63
+      type: InternalIP
+    - address: 54.71.208.125
+      type: ExternalIP
+    - address: ip-172-23-1-63.us-west-2.compute.internal
+      type: InternalDNS
+    - address: ip-172-23-1-63.us-west-2.compute.internal
+      type: Hostname
+    allocatable:
+      attachable-volumes-aws-ebs: "39"
+      cpu: "4"
+      ephemeral-storage: "46779129369"
+      hugepages-1Gi: "0"
+      hugepages-2Mi: "0"
+      memory: 7548444Ki
+      pods: "110"
+    capacity:
+      attachable-volumes-aws-ebs: "39"
+      cpu: "4"
+      ephemeral-storage: 50758604Ki
+      hugepages-1Gi: "0"
+      hugepages-2Mi: "0"
+      memory: 7650844Ki
+      pods: "110"
+    conditions:
+    - lastHeartbeatTime: "2019-08-20T06:05:40Z"
+      lastTransitionTime: "2019-08-15T09:43:36Z"
+      message: kubelet has sufficient memory available
+      reason: KubeletHasSufficientMemory
+      status: "False"
+      type: MemoryPressure
+    - lastHeartbeatTime: "2019-08-20T06:05:40Z"
+      lastTransitionTime: "2019-08-15T09:43:36Z"
+      message: kubelet has no disk pressure
+      reason: KubeletHasNoDiskPressure
+      status: "False"
+      type: DiskPressure
+    - lastHeartbeatTime: "2019-08-20T06:05:40Z"
+      lastTransitionTime: "2019-08-15T09:43:36Z"
+      message: kubelet has sufficient PID available
+      reason: KubeletHasSufficientPID
+      status: "False"
+      type: PIDPressure
+    - lastHeartbeatTime: "2019-08-20T06:05:40Z"
+      lastTransitionTime: "2019-08-15T09:43:47Z"
+      message: kubelet is posting ready status. AppArmor enabled
+      reason: KubeletReady
+      status: "True"
+      type: Ready
+    daemonEndpoints:
+      kubeletEndpoint:
+        Port: 10250
+    images:
+    - names:
+      - quay.io/prophetstor/alameda-ai@sha256:f844d589820ccbc7b240e416df2d666297d08374ca325447e4ad908cf00d357c
+      - quay.io/prophetstor/alameda-ai:v4.2.159
+      sizeBytes: 1383654377
+    - names:
+      - quay.io/prophetstor/alameda-ai@sha256:7bf2561ae69bc053bf5dfd74b7e016f552cf97d107349de2922fade19d626e5b
+      - quay.io/prophetstor/alameda-ai:v4.2.158
+      sizeBytes: 1383654377
+    - names:
+      - quay.io/prophetstor/alameda-ai@sha256:cb16ba2bd099eba7a0c9fb7d6b882f5beeed10a9a0e651cbede4b4339aced4b0
+      - quay.io/prophetstor/alameda-ai:v4.2.157
+      sizeBytes: 1383391437
+    - names:
+      - quay.io/prophetstor/fedemeter-api-ubi@sha256:eb7625070f079f9aaffd4efef7eb4ece8850bb21196cfd7ec767377f3890cc12
+      - quay.io/prophetstor/fedemeter-api-ubi:v4.2.158
+      sizeBytes: 601291876
+    - names:
+      - quay.io/prophetstor/federatorai-demo-manager@sha256:0a471224052aa0362a813acff413f00a5a0d5fff515f6936b7617337a4ef9a35
+      - quay.io/prophetstor/federatorai-demo-manager:latest
+      sizeBytes: 565615057
+    - names:
+      - k8s.gcr.io/etcd@sha256:17da501f5d2a675be46040422a27b7cc21b8a43895ac998b171db1c346f361f7
+      - k8s.gcr.io/etcd:3.3.10
+      sizeBytes: 258116302
+    - names:
+      - quay.io/prophetstor/alameda-grafana@sha256:7d7193d7cfe21f7d4e909f945508ad985bf4582139c1ca9dabc7db1993b544a8
+      - quay.io/prophetstor/alameda-grafana:v4.2.157
+      sizeBytes: 248343569
+    - names:
+      - grafana/grafana@sha256:c2100550937e7aa0f3e33c2fc46a8c9668c3b5f2f71a8885e304d35de9fea009
+      - grafana/grafana:6.1.4
+      sizeBytes: 244737141
+    - names:
+      - k8s.gcr.io/kube-apiserver@sha256:5fae387bacf1def6c3915b4a3035cf8c8a4d06158b2e676721776d3d4afc05a2
+      - k8s.gcr.io/kube-apiserver:v1.15.2
+      sizeBytes: 206823358
+    - names:
+      - kiwigrid/k8s-sidecar@sha256:899ccd0b1f543217ca37ba8b0aae558dcf6feb5698db5a3b0f311e034049698f
+      - kiwigrid/k8s-sidecar:0.0.16
+      sizeBytes: 192392145
+    - names:
+      - k8s.gcr.io/kube-controller-manager@sha256:7d3fc48cf83aa0a7b8f129fa4255bb5530908e1a5b194be269ea8329b48e9598
+      - k8s.gcr.io/kube-controller-manager:v1.15.2
+      sizeBytes: 158718526
+    - names:
+      - influxdb@sha256:2847716e3b3175d0e0c4af9e6c48599654b9f4fa37961b6b22dc1524d57e4f2b
+      - influxdb:1.7-alpine
+      sizeBytes: 136590371
+    - names:
+      - quay.io/prophetstor/federatorai-operator-ubi@sha256:f892a65ce6381077d9c259bfcf8574c48b4087cd1063cf0153c5ded8ea313495
+      - quay.io/prophetstor/federatorai-operator-ubi:v4.2.158
+      sizeBytes: 127029085
+    - names:
+      - quay.io/prophetstor/alameda-datahub-ubi@sha256:9544bd18d6358bc757ae85176e52f2a02111b1c7981bc75d263e518f127aa738
+      - quay.io/prophetstor/alameda-datahub-ubi:v4.2.157
+      sizeBytes: 123239127
+    - names:
+      - nginx@sha256:3e373fd5b8d41baeddc24be311c5c6929425c04cabf893b874ac09b72a798010
+      - nginx:1.16.0
+      sizeBytes: 109369748
+    - names:
+      - gcr.io/google_containers/kubernetes-dashboard-amd64@sha256:dc4026c1b595435ef5527ca598e1e9c4343076926d7d62b365c44831395adbd0
+      - gcr.io/google_containers/kubernetes-dashboard-amd64:v1.8.3
+      sizeBytes: 102319441
+    - names:
+      - k8s.gcr.io/kube-proxy@sha256:626f983f25f8b7799ca7ab001fd0985a72c2643c0acb877d2888c0aa4fcbdf56
+      - k8s.gcr.io/kube-proxy:v1.15.2
+      sizeBytes: 82408284
+    - names:
+      - gcr.io/kubernetes-helm/tiller@sha256:3060d5de6614e96adf540c10528929a056b1a7751e781beff4cc00d2e47e114c
+      - gcr.io/kubernetes-helm/tiller:v2.12.1
+      sizeBytes: 81398784
+    - names:
+      - k8s.gcr.io/kube-scheduler@sha256:8fd3c3251f07234a234469e201900e4274726f1fe0d5dc6fb7da911f1c851a1a
+      - k8s.gcr.io/kube-scheduler:v1.15.2
+      sizeBytes: 81107582
+    - names:
+      - quay.io/coreos/prometheus-operator@sha256:5abe9bdfd93ac22954e3281315637d9721d66539134e1c7ed4e97f13819e62f7
+      - quay.io/coreos/prometheus-operator:v0.29.0
+      sizeBytes: 45483873
+    - names:
+      - quay.io/coreos/flannel@sha256:88f2b4d96fae34bfff3d46293f7f18d1f9f3ca026b4a4d288f28347fcb6580ac
+      - quay.io/coreos/flannel:v0.10.0-amd64
+      sizeBytes: 44598861
+    - names:
+      - k8s.gcr.io/coredns@sha256:02382353821b12c21b062c59184e227e001079bb13ebd01f9d3270ba0fcbf1e4
+      - k8s.gcr.io/coredns:1.3.1
+      sizeBytes: 40303560
+    - names:
+      - gcr.io/stackpoint-public/stackpoint-bootstrap@sha256:00b9fa51512c94df692aa8271d1d63d2f81c2c2613ede541b34cf9b1d43be2b4
+      - gcr.io/stackpoint-public/stackpoint-bootstrap:v0.1.4
+      sizeBytes: 21627146
+    - names:
+      - quay.io/prometheus/node-exporter@sha256:1b129a3801a0440f9c5b2afb20082dfdb31bf6092b561f5f249531130000cb83
+      - quay.io/prometheus/node-exporter:v0.17.0
+      sizeBytes: 20982005
+    - names:
+      - alpine@sha256:6a92cd1fcdc8d8cdec60f33dda4db2cb1fcdcacf3410a8e05b3741f44a9b5998
+      - alpine:latest
+      sizeBytes: 5581746
+    - names:
+      - k8s.gcr.io/pause@sha256:f78411e19d84a252e53bff71a4407a5686c46983a2c2eeed83929b888179acea
+      - k8s.gcr.io/pause:3.1
+      sizeBytes: 742472
+    nodeInfo:
+      architecture: amd64
+      bootID: 50e02a2a-1e1f-4382-802c-5d4fb5bd9c1c
+      containerRuntimeVersion: docker://18.9.4
+      kernelVersion: 4.15.0-1044-aws
+      kubeProxyVersion: v1.15.2
+      kubeletVersion: v1.15.2
+      machineID: 1b421c05cd0641b7a9f7eb7e38832371
+      operatingSystem: linux
+      osImage: Ubuntu 18.04.2 LTS
+      systemUUID: EC2FC1C2-2205-205E-A7B4-622D5CC2CB59
+- apiVersion: v1
+  kind: Node
+  metadata:
+    annotations:
+      flannel.alpha.coreos.com/backend-data: '{"VtepMAC":"62:4c:b5:93:c1:2c"}'
+      flannel.alpha.coreos.com/backend-type: vxlan
+      flannel.alpha.coreos.com/kube-subnet-manager: "true"
+      flannel.alpha.coreos.com/public-ip: 172.23.1.67
+      kubeadm.alpha.kubernetes.io/cri-socket: /var/run/dockershim.sock
+      node.alpha.kubernetes.io/ttl: "0"
+      volumes.kubernetes.io/controller-managed-attach-detach: "true"
+    creationTimestamp: "2019-08-15T09:43:37Z"
+    labels:
+      beta.kubernetes.io/arch: amd64
+      beta.kubernetes.io/instance-type: c4.xlarge
+      beta.kubernetes.io/os: linux
+      failure-domain.beta.kubernetes.io/region: us-west-2
+      failure-domain.beta.kubernetes.io/zone: us-west-2a
+      kubernetes.io/arch: amd64
+      kubernetes.io/hostname: ip-172-23-1-67.us-west-2.compute.internal
+      kubernetes.io/os: linux
+      stackpoint.io/cluster_id: "23391"
+      stackpoint.io/instance_id: netatt9dgn-worker-2
+      stackpoint.io/node_group: autoscaling-netatt9dgn-pool-1
+      stackpoint.io/node_id: "91192"
+      stackpoint.io/node_pool: Default-Worker-Pool
+      stackpoint.io/private_ip: 172.23.1.67
+      stackpoint.io/role: worker
+      stackpoint.io/size: c4.xlarge
+    name: ip-172-23-1-67.us-west-2.compute.internal
+    resourceVersion: "673821"
+    selfLink: /api/v1/nodes/ip-172-23-1-67.us-west-2.compute.internal
+    uid: 95f2784d-eab7-4717-ad23-9e32c3c8df20
+  spec:
+    podCIDR: 10.2.2.0/24
+    providerID: aws:///us-west-2a/i-01a08072ceabff4ab
+  status:
+    addresses:
+    - address: 172.23.1.67
+      type: InternalIP
+    - address: 34.217.93.248
+      type: ExternalIP
+    - address: ip-172-23-1-67.us-west-2.compute.internal
+      type: InternalDNS
+    - address: ip-172-23-1-67.us-west-2.compute.internal
+      type: Hostname
+    allocatable:
+      attachable-volumes-aws-ebs: "39"
+      cpu: "4"
+      ephemeral-storage: "46779129369"
+      hugepages-1Gi: "0"
+      hugepages-2Mi: "0"
+      memory: 7548444Ki
+      pods: "110"
+    capacity:
+      attachable-volumes-aws-ebs: "39"
+      cpu: "4"
+      ephemeral-storage: 50758604Ki
+      hugepages-1Gi: "0"
+      hugepages-2Mi: "0"
+      memory: 7650844Ki
+      pods: "110"
+    conditions:
+    - lastHeartbeatTime: "2019-08-20T06:06:19Z"
+      lastTransitionTime: "2019-08-15T09:43:37Z"
+      message: kubelet has sufficient memory available
+      reason: KubeletHasSufficientMemory
+      status: "False"
+      type: MemoryPressure
+    - lastHeartbeatTime: "2019-08-20T06:06:19Z"
+      lastTransitionTime: "2019-08-15T09:43:37Z"
+      message: kubelet has no disk pressure
+      reason: KubeletHasNoDiskPressure
+      status: "False"
+      type: DiskPressure
+    - lastHeartbeatTime: "2019-08-20T06:06:19Z"
+      lastTransitionTime: "2019-08-15T09:43:37Z"
+      message: kubelet has sufficient PID available
+      reason: KubeletHasSufficientPID
+      status: "False"
+      type: PIDPressure
+    - lastHeartbeatTime: "2019-08-20T06:06:19Z"
+      lastTransitionTime: "2019-08-15T09:43:47Z"
+      message: kubelet is posting ready status. AppArmor enabled
+      reason: KubeletReady
+      status: "True"
+      type: Ready
+    daemonEndpoints:
+      kubeletEndpoint:
+        Port: 10250
+    images:
+    - names:
+      - quay.io/prophetstor/alameda-ai@sha256:cb16ba2bd099eba7a0c9fb7d6b882f5beeed10a9a0e651cbede4b4339aced4b0
+      - quay.io/prophetstor/alameda-ai:v4.2.157
+      sizeBytes: 1383391437
+    - names:
+      - quay.io/prophetstor/fedemeter-api-ubi@sha256:4d497f82822b70b0248a6afb4d5c769965d244aa44ca10a3d4312db8730f472f
+      - quay.io/prophetstor/fedemeter-api-ubi:v4.2.159
+      sizeBytes: 601291876
+    - names:
+      - quay.io/prophetstor/fedemeter-api-ubi@sha256:faf036ce15005b5786abe76a5e7f803a6d3f88012ea01ad58fb730a9edd31a44
+      - quay.io/prophetstor/fedemeter-api-ubi:v4.2.157
+      sizeBytes: 601152437
+    - names:
+      - quay.io/prophetstor/federatorai-demo-manager@sha256:0a471224052aa0362a813acff413f00a5a0d5fff515f6936b7617337a4ef9a35
+      - quay.io/prophetstor/federatorai-demo-manager:latest
+      sizeBytes: 565615057
+    - names:
+      - quay.io/prophetstor/fedemeter-influxdb@sha256:a6511253a622fa824f06ffd247ad2dbc70234bb5a0dc09c9b44b7f3cdefb3bf7
+      - quay.io/prophetstor/fedemeter-influxdb:v4.2.157
+      sizeBytes: 369205317
+    - names:
+      - quay.io/prophetstor/fedemeter-influxdb@sha256:2c9ce68511ff1211b79ddebc9927e6af58ad7682ca22c761d61541e9bba11b57
+      - quay.io/prophetstor/fedemeter-influxdb@sha256:b5869df4e0eab45a6ba0bc7834b27759b92bb01d3d7c6605c1c490a1038e6195
+      - quay.io/prophetstor/fedemeter-influxdb:v4.2.158
+      - quay.io/prophetstor/fedemeter-influxdb:v4.2.159
+      sizeBytes: 369205317
+    - names:
+      - k8s.gcr.io/etcd@sha256:17da501f5d2a675be46040422a27b7cc21b8a43895ac998b171db1c346f361f7
+      - k8s.gcr.io/etcd:3.3.10
+      sizeBytes: 258116302
+    - names:
+      - quay.io/prophetstor/alameda-grafana@sha256:6ef66f502b6717208def7139023898972d1aaeb6437e01a4528275b7dd02835c
+      - quay.io/prophetstor/alameda-grafana:v4.2.159
+      sizeBytes: 248397666
+    - names:
+      - quay.io/prophetstor/alameda-grafana@sha256:7d7193d7cfe21f7d4e909f945508ad985bf4582139c1ca9dabc7db1993b544a8
+      - quay.io/prophetstor/alameda-grafana:v4.2.157
+      sizeBytes: 248343569
+    - names:
+      - quay.io/prophetstor/alameda-grafana@sha256:ec61b975d5044267f0b2888c5fe231927f56c55e85ff054dd5b327a1d413b7ef
+      - quay.io/prophetstor/alameda-grafana:v4.2.158
+      sizeBytes: 248326676
+    - names:
+      - k8s.gcr.io/kube-apiserver@sha256:5fae387bacf1def6c3915b4a3035cf8c8a4d06158b2e676721776d3d4afc05a2
+      - k8s.gcr.io/kube-apiserver:v1.15.2
+      sizeBytes: 206823358
+    - names:
+      - k8s.gcr.io/kube-controller-manager@sha256:7d3fc48cf83aa0a7b8f129fa4255bb5530908e1a5b194be269ea8329b48e9598
+      - k8s.gcr.io/kube-controller-manager:v1.15.2
+      sizeBytes: 158718526
+    - names:
+      - quay.io/prophetstor/federatorai-operator-ubi@sha256:16210acdb6409f54d916bc073cf16faddf899e612aa49ac04305278776756f0e
+      - quay.io/prophetstor/federatorai-operator-ubi:v4.2.159
+      sizeBytes: 127029085
+    - names:
+      - quay.io/prophetstor/federatorai-operator-ubi@sha256:6c678ab1e4c803fc73355c9e0158022af218397ea1e57811e0275ec7c3baab2b
+      - quay.io/prophetstor/federatorai-operator-ubi:v4.2.157
+      sizeBytes: 127028835
+    - names:
+      - nginx@sha256:5411d8897c3da841a1f45f895b43ad4526eb62d3393c3287124a56be49962d41
+      - nginx:latest
+      sizeBytes: 125850912
+    - names:
+      - quay.io/prophetstor/alameda-operator-ubi@sha256:6840ad7a6bc6702339aac535622e87fce9083919ae317fdf4da0392a2ed42891
+      - quay.io/prophetstor/alameda-operator-ubi:v4.2.159
+      sizeBytes: 123878255
+    - names:
+      - quay.io/prophetstor/alameda-operator-ubi@sha256:0275e683db908785a91c780b23680998a4ece6e17977184b3c2e6950d352d634
+      - quay.io/prophetstor/alameda-operator-ubi:v4.2.157
+      sizeBytes: 123878255
+    - names:
+      - quay.io/prophetstor/alameda-operator-ubi@sha256:f891d16ea5bd6490859608e17601cc43b3114c77198bd58437516c9c998f13af
+      - quay.io/prophetstor/alameda-operator-ubi:v4.2.158
+      sizeBytes: 123878255
+    - names:
+      - quay.io/prophetstor/alameda-datahub-ubi@sha256:5ec1cdb64a9b5ab4f9a5c208eaaade3a46daa04c895ff90d7f15d6e65e4a4aec
+      - quay.io/prophetstor/alameda-datahub-ubi:v4.2.158
+      sizeBytes: 123239127
+    - names:
+      - quay.io/prophetstor/alameda-datahub-ubi@sha256:75d8d34da0a27e8d3d251ddb630fb6975d957b1f3a0af4503aa179d0cf13ec81
+      - quay.io/prophetstor/alameda-datahub-ubi:v4.2.159
+      sizeBytes: 123239127
+    - names:
+      - quay.io/prophetstor/alameda-evictioner-ubi@sha256:7d07dc1d0fed5516044b7e167bc2aca78b4d479ca9a44061447092c7faf56dd1
+      - quay.io/prophetstor/alameda-evictioner-ubi:v4.2.159
+      sizeBytes: 121468491
+    - names:
+      - quay.io/prophetstor/alameda-evictioner-ubi@sha256:ee4d1d87af63153492e964f8f0458df0b8de34df418764b4cc476a4e0917ba7b
+      - quay.io/prophetstor/alameda-evictioner-ubi:v4.2.157
+      sizeBytes: 121464395
+    - names:
+      - quay.io/prophetstor/alameda-evictioner-ubi@sha256:a3bee94f37c92d497ffcb000a5d7854b715af7422186fedaef59bb9358e277c2
+      - quay.io/prophetstor/alameda-evictioner-ubi:v4.2.158
+      sizeBytes: 121464395
+    - names:
+      - quay.io/prometheus/prometheus@sha256:e02bb3dec47631b4d31cede2d35ff901d892b57f33144406ee7994e8c94fb2d7
+      - quay.io/prometheus/prometheus:v2.9.1
+      sizeBytes: 121187253
+    - names:
+      - quay.io/prophetstor/alameda-admission-ubi@sha256:021f56c50e4fde199630e067509bb048e5279b8d9860af96a8897e10758cdd0d
+      - quay.io/prophetstor/alameda-admission-ubi:v4.2.159
+      sizeBytes: 119390821
+    - names:
+      - quay.io/prophetstor/alameda-admission-ubi@sha256:86d89bfdfaf35cc75ab3e8cc014ba31f3f6912f1840ef45cc72c1129d927b15a
+      - quay.io/prophetstor/alameda-admission-ubi:v4.2.157
+      sizeBytes: 119390821
+    - names:
+      - quay.io/prophetstor/alameda-admission-ubi@sha256:90b5b69c3e48091aa8282e7c21d6024d5dfe52ab0d72bedcc034b2a184818924
+      - quay.io/prophetstor/alameda-admission-ubi:v4.2.158
+      sizeBytes: 119390821
+    - names:
+      - quay.io/prophetstor/alameda-executor-ubi@sha256:15e1608edbf69354d99d42d38690470da5c104fec099426acc131a03353e7c5f
+      - quay.io/prophetstor/alameda-executor-ubi:v4.2.158
+      sizeBytes: 118734302
+    - names:
+      - quay.io/prophetstor/alameda-executor-ubi@sha256:7b78e3066c278d34f514e1c39c311c80583ea1e15b4fb9b2684b338ff1673741
+      - quay.io/prophetstor/alameda-executor-ubi:v4.2.157
+      sizeBytes: 118734302
+    - names:
+      - quay.io/prophetstor/alameda-executor-ubi@sha256:ce346cadda4491e869647171a63725af8cf2eae3a9843495eed7e0b7f0379352
+      - quay.io/prophetstor/alameda-executor-ubi:v4.2.159
+      sizeBytes: 118734302
+    - names:
+      - nginx@sha256:3e373fd5b8d41baeddc24be311c5c6929425c04cabf893b874ac09b72a798010
+      - nginx:1.16.0
+      sizeBytes: 109369748
+    - names:
+      - quay.io/prophetstor/alameda-recommender-ubi@sha256:c4a9153b67d53a634689b34fadea99e40fcd056e3a3e5e4f70cbf7c5fb62adcd
+      - quay.io/prophetstor/alameda-recommender-ubi:v4.2.159
+      sizeBytes: 93120194
+    - names:
+      - quay.io/prophetstor/alameda-recommender-ubi@sha256:86a7abeb64ec5717774e800f2e4046d58c0826b5a2d64e755410c1016baba483
+      - quay.io/prophetstor/alameda-recommender-ubi:v4.2.158
+      sizeBytes: 93120068
+    - names:
+      - quay.io/prophetstor/alameda-recommender-ubi@sha256:9cd70dd276f03b16c35af6f60fb252a3501fa868fd271ef9ba268122aa6115d1
+      - quay.io/prophetstor/alameda-recommender-ubi:v4.2.157
+      sizeBytes: 93115726
+    - names:
+      - k8s.gcr.io/kube-proxy@sha256:626f983f25f8b7799ca7ab001fd0985a72c2643c0acb877d2888c0aa4fcbdf56
+      - k8s.gcr.io/kube-proxy:v1.15.2
+      sizeBytes: 82408284
+    - names:
+      - k8s.gcr.io/kube-scheduler@sha256:8fd3c3251f07234a234469e201900e4274726f1fe0d5dc6fb7da911f1c851a1a
+      - k8s.gcr.io/kube-scheduler:v1.15.2
+      sizeBytes: 81107582
+    - names:
+      - gcr.io/google_containers/heapster-amd64@sha256:f58ded16b56884eeb73b1ba256bcc489714570bacdeca43d4ba3b91ef9897b20
+      - gcr.io/google_containers/heapster-amd64:v1.4.2
+      sizeBytes: 73404034
+    - names:
+      - quay.io/coreos/flannel@sha256:88f2b4d96fae34bfff3d46293f7f18d1f9f3ca026b4a4d288f28347fcb6580ac
+      - quay.io/coreos/flannel:v0.10.0-amd64
+      sizeBytes: 44598861
+    - names:
+      - quay.io/prometheus/alertmanager@sha256:45ad0b456809a54152fb668f102f257726d92476a6cdb1615dfdf17c42a78331
+      - quay.io/prometheus/alertmanager:v0.16.2
+      sizeBytes: 42533012
+    - names:
+      - k8s.gcr.io/coredns@sha256:02382353821b12c21b062c59184e227e001079bb13ebd01f9d3270ba0fcbf1e4
+      - k8s.gcr.io/coredns:1.3.1
+      sizeBytes: 40303560
+    - names:
+      - k8s.gcr.io/kube-state-metrics@sha256:37c4ddfa160043a7fd73703b7cae41cf38b692ca19c1dff722293c90a386b59f
+      - k8s.gcr.io/kube-state-metrics:v1.5.0
+      sizeBytes: 31825332
+    - names:
+      - gcr.io/stackpoint-public/stackpoint-bootstrap@sha256:00b9fa51512c94df692aa8271d1d63d2f81c2c2613ede541b34cf9b1d43be2b4
+      - gcr.io/stackpoint-public/stackpoint-bootstrap:v0.1.4
+      sizeBytes: 21627146
+    - names:
+      - quay.io/coreos/prometheus-config-reloader@sha256:d4b5c90b0937b568d25baa38d8ca61ac927069f30f02e8757f0eae9ee335be23
+      - quay.io/coreos/prometheus-config-reloader:v0.29.0
+      sizeBytes: 21271393
+    - names:
+      - quay.io/prometheus/node-exporter@sha256:1b129a3801a0440f9c5b2afb20082dfdb31bf6092b561f5f249531130000cb83
+      - quay.io/prometheus/node-exporter:v0.17.0
+      sizeBytes: 20982005
+    - names:
+      - alpine@sha256:6a92cd1fcdc8d8cdec60f33dda4db2cb1fcdcacf3410a8e05b3741f44a9b5998
+      - alpine:latest
+      sizeBytes: 5581746
+    - names:
+      - quay.io/coreos/configmap-reload@sha256:e2fd60ff0ae4500a75b80ebaa30e0e7deba9ad107833e8ca53f0047c42c5a057
+      - quay.io/coreos/configmap-reload:v0.0.1
+      sizeBytes: 4785056
+    - names:
+      - k8s.gcr.io/pause@sha256:f78411e19d84a252e53bff71a4407a5686c46983a2c2eeed83929b888179acea
+      - k8s.gcr.io/pause:3.1
+      sizeBytes: 742472
+    nodeInfo:
+      architecture: amd64
+      bootID: 70891b93-bf5e-4e37-bcc1-ef2183d51059
+      containerRuntimeVersion: docker://18.9.4
+      kernelVersion: 4.15.0-1044-aws
+      kubeProxyVersion: v1.15.2
+      kubeletVersion: v1.15.2
+      machineID: ffaf132f702647dda8c94f6c85d77c6c
+      operatingSystem: linux
+      osImage: Ubuntu 18.04.2 LTS
+      systemUUID: EC24EC15-9A20-B6AF-2E7E-85A1C48DFC77
+kind: List
+metadata:
+  resourceVersion: ""
+  selfLink: ""
