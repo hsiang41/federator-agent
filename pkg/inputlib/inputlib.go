@@ -12,14 +12,19 @@ func (i inputLib) Gather() error {
 	return nil
 }
 
-func (i inputLib) LoadConfig(config string, scope *logUtil.Scope) error {
+func (i inputLib) LoadConfig(config *string, scope *logUtil.Scope) error {
 	return nil
+}
+
+func (i inputLib) Close() {
+
 }
 
 var InputLib inputLib
 
 type InputLibrary interface {
 	Gather() error
-	LoadConfig(config string, scope *logUtil.Scope) error
+	LoadConfig(config *string, scope *logUtil.Scope) error
 	SetAgentQueue(agentQueue *queue.Queue)
+	Close()
 }

@@ -16,10 +16,15 @@ func (o outputlib) LoadConfig(config string, scope *logUtil.Scope) error {
 	return nil
 }
 
+func (o outputlib) Close() {
+
+}
+
 var OutputLib outputlib
 
 type OutputLibrary interface {
 	Write() error
 	LoadConfig(config string, scope *logUtil.Scope) error
 	SetAgentQueue(agentQueue *queue.Queue)
+	Close()
 }

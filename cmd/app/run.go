@@ -80,20 +80,25 @@ const (
 )
 
 type ScheduleJob struct {
-	libPath     string
-	configPath  string
-	libType     LibType
+	LibPath     string
+	ConfigPath  string
+	LibType     LibType
 }
 
-func (s ScheduleJob) Run() {
+func NewScheduleJob(libPath string, configPath string, libType LibType) *ScheduleJob {
+	return &ScheduleJob{LibPath: libPath, ConfigPath: configPath, LibType: libType}
+}
+
+func (s *ScheduleJob) Run() {
 	var symName string
-	p, err := plugin.Open(s.libPath)
+	p, err := plugin.Open(s.LibPath)
 	if err != nil {
 		logger.Errorf(fmt.Sprintf("Failed to open library: %v", err))
 		return
 	}
 
-	if s.libType == LibTypeInput {
+	logger.Debugf(fmt.Sprintf("object %p", p))
+	if s.LibType == LibTypeInput {
 		symName = "InputLib"
 	} else
 	{
@@ -105,28 +110,31 @@ func (s ScheduleJob) Run() {
 		os.Exit(1)
 	}
 
-	if s.libType == LibTypeInput {
+	if s.LibType == LibTypeInput {
 		var libObj InputLib.InputLibrary
 		libObj, ok := libName.(InputLib.InputLibrary)
 		if !ok {
 			logger.Errorf(fmt.Sprintf("Failed to load input library object: %v", ok))
 			return
 		}
-
-		libObj.LoadConfig(s.configPath, logger)
+		defer libObj.Close()
+		//logger.Debugf(fmt.Sprintf("Load config: %s", s.ConfigPath))
+		libObj.LoadConfig(&s.ConfigPath, logger)
 		libObj.SetAgentQueue(agentQueue)
 		libObj.Gather()
-	} else if s.libType == LibTypeOutput {
+	} else if s.LibType == LibTypeOutput {
 		var libObj OutputLib.OutputLibrary
 		libObj, ok := libName.(OutputLib.OutputLibrary)
 		if !ok {
 			logger.Errorf(fmt.Sprintf("Failed to load output library object: %v", ok))
 			return
 		}
-
-		libObj.LoadConfig(s.configPath, logger)
+		defer libObj.Close()
+		//logger.Debugf(fmt.Sprintf("Load config: %s", s.ConfigPath))
+		libObj.LoadConfig(s.ConfigPath, logger)
 		libObj.SetAgentQueue(agentQueue)
 		libObj.Write()
+
 	}
 }
 
@@ -149,21 +157,27 @@ func startAgent() {
 
 	// For input library
 	for _, v := range agentConfig.InputJobs {
+		logger.Info(fmt.Sprintf("input: %v", v))
 		c.AddFunc(v.ScheduledTaskSpec, func() {
-			logger.Debug(fmt.Sprintf("Start cron input job: %v", v))
+			logger.Debug(fmt.Sprintf("Start cron input job"))
 		})
-		go ScheduleJob{v.LibPath, v.LibConfiguration, LibTypeInput}.Run()
-		c.AddJob(v.ScheduledTaskSpec, ScheduleJob{v.LibPath, v.LibConfiguration, LibTypeInput})
+		sJ := NewScheduleJob(v.LibPath, v.LibConfiguration, LibTypeInput)
+		logger.Debugf(fmt.Sprintf("function point %p", sJ))
+		sJ.Run()
+		c.AddJob(v.ScheduledTaskSpec, sJ)
 	}
 
 	// For output library
 	for _, v := range agentConfig.OutputJobs {
+		logger.Info(fmt.Sprintf("output: %v", v))
 		c.AddFunc(v.ScheduledTaskSpec, func() {
 			logger.Debug(fmt.Sprintf("Start cron output job: %v", v))
 		})
-		c.AddJob(v.ScheduledTaskSpec, ScheduleJob{v.LibPath, v.LibConfiguration, LibTypeOutput})
+		sJ := NewScheduleJob(v.LibPath, v.LibConfiguration, LibTypeInput)
+		c.AddJob(v.ScheduledTaskSpec, sJ)
 	}
 
+	c.Run()
 	c.Start()
 	c.Entries()
 	defer c.Stop()

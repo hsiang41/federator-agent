@@ -13,11 +13,11 @@ import (
 )
 
 type jeriParameter struct {
-	tsfrom      int64
-	tsto        int64
-	granularity int64
-	fill_days    int
-	jeri        bool
+	tsfrom          int64
+	tsto            int64
+	granularity     int64
+	fill_days       int
+	ri_calculator   bool
 }
 
 func NewFedermeter(apiUrl string, username string, password string, logger *logUtil.Scope) *Fedemeter {
@@ -57,6 +57,12 @@ func (f *Fedemeter) request(method string, url string, requestBody []byte, param
 			switch refV.Field(i).Kind() {
 			case reflect.Int64, reflect.Int:
 				value = fmt.Sprintf("%d", refV.Field(i).Int())
+			case reflect.Bool:
+				if refV.Field(i).Bool() == true {
+					value = "true"
+				} else {
+					value = "false"
+				}
 			default:
 				value = refV.Field(i).String()
 			}
@@ -141,7 +147,7 @@ func (f *Fedemeter) GetRecommenderationJeri(tsFrom int64, tsTo int64, granularit
 	if err != nil {
 		return nil, err
 	}
-	parms := &jeriParameter{tsfrom: tsFrom, tsto: tsTo, granularity: granularity, fill_days: fillDays, jeri: jeri}
+	parms := &jeriParameter{tsfrom: tsFrom, tsto: tsTo, granularity: granularity, fill_days: fillDays, ri_calculator: jeri}
 	res, err := f.request("PUT", fmt.Sprintf("%s/recommendations/jeri", f.apiUrl), reqBody, parms)
 	if err != nil {
 		f.logger.Errorf("Failed to get recommendations jeri, %v", err)

@@ -341,11 +341,8 @@ func (n *InfluxMeasurement)generateCalculateRecommendation(starttime *timestamp.
 		for _, pK := range sv {
 			for _, pKI := range pK {
 				for provider, inst := range pKI {
-					var totalcost float64
-					var rcData recommendatioinJeri
-					rcData.StartTime = starttime.Seconds
+					var region string
 					for k, v := range inst {
-						var region string
 						var instanceType string
 						var riInstance []fedemeter.FedJeriInstance
 						switch k {
@@ -354,7 +351,6 @@ func (n *InfluxMeasurement)generateCalculateRecommendation(starttime *timestamp.
 							if err != nil {
 								region = ""
 							}
-							rcData.Region = region
 						default:
 							instanceType = k
 							riInstance = make([]fedemeter.FedJeriInstance, 0)
@@ -364,8 +360,10 @@ func (n *InfluxMeasurement)generateCalculateRecommendation(starttime *timestamp.
 								riInstance = nil
 							}
 							if riInstance != nil && len(riInstance) > 0 {
+								var rcData recommendatioinJeri
+								rcData.StartTime = starttime.Seconds
 								lstData := riInstance[len(riInstance) - 1]
-								totalcost = lstData.AccCost
+								totalcost := lstData.AccCost
 								rcData.TotalCost = totalcost
 								rcData.MasterNum = lstData.MasterNum
 								if n.ReservedInstances == true {
@@ -387,11 +385,11 @@ func (n *InfluxMeasurement)generateCalculateRecommendation(starttime *timestamp.
 								rcData.Provider = provider
 								rcData.WorkerNum = lstData.WorkerNum
 								rcData.ResourceName = resourceName
+								rcData.Region = region
+								rcDatas = append(rcDatas, &rcData)
 							}
 						}
 					}
-					rcDatas = append(rcDatas, &rcData)
-
 				}
 			}
 		}
