@@ -6,7 +6,7 @@ import (
 	"github.com/containers-ai/federatorai-agent/pkg/fedemeter"
 	"fmt"
 	"github.com/containers-ai/federatorai-agent/pkg/utils"
-	"github.com/micro/protobuf/ptypes"
+	"github.com/golang/protobuf/ptypes"
 	"github.com/golang/protobuf/ptypes/timestamp"
 )
 
