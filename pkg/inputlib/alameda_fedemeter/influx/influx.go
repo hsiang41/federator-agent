@@ -27,7 +27,7 @@ func init() {
 	MeasurementColumns = make(map[EnumMeasurementID][]string, 0)
 	MeasurementColumns[0] = []string{"starttime", "provider", "nodename", "unit", "instancetype", "cpu", "memory", "totalcost", "displayname", "instancenum", "region", "description", "cost", "granularity"}
 	MeasurementColumns[1] = []string{"starttime", "nodename", "volumetype", "unit", "storagesize", "description", "cost", "displayname", "granularity"}
-	MeasurementColumns[2] = []string{"starttime", "resourcename", "provider", "granularity", "region", "instancetype", "totalcost", "unit", "masternum", "workernum", "masterstoragesize", "workerstoragesize", "ondemandnum", "revservedinstances",
+	MeasurementColumns[2] = []string{"starttime", "resourcename", "provider", "granularity", "region", "instancetype", "totalcost", "masternum", "workernum", "masterstoragesize", "workerstoragesize", "ondemandnum", "revservedinstances",
 	"displayname", "master_ri_num", "worker_ri_num", "master_ondemand_num", "worker_ondemand_num"}
 }
 
@@ -55,7 +55,6 @@ type recommendatioinJeri struct {
 	Region            string
 	InstanceType      string
 	TotalCost         float64
-	Unit              string
 	MasterNum         int
 	WorkerNum         int
 	MasterStorageSize float64
@@ -372,7 +371,6 @@ func (n *InfluxMeasurement)generateCalculateRecommendation(starttime *timestamp.
 									rcData.ReservedInstances = 0
 								}
 								rcData.Granularity = n.Granularity
-								rcData.Unit = "hour"
 								rcData.InstanceType = instanceType
 								rcData.OndemandNum = lstData.OndemandNum
 								rcData.MasterStorageSize = lstData.MasterStorageSize
