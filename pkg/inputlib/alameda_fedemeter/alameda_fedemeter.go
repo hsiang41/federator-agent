@@ -18,6 +18,7 @@ import (
 	"github.com/golang/protobuf/ptypes"
 	"github.com/golang/protobuf/ptypes/timestamp"
 	FedRaw "github.com/containers-ai/federatorai-agent/pkg/inputlib/alameda_fedemeter/influx"
+	datahubV1a1pha1 "github.com/containers-ai/api/alameda_api/v1alpha1/datahub"
 )
 
 type CostAnalysisConf struct {
@@ -59,6 +60,7 @@ func getTimeFromTo(starttime *timestamp.Timestamp, durationDays int) (int64, int
 }
 
 func (i inputLib) Gather() error {
+	fedNodes := make([]*datahubV1a1pha1.Node, 0)
 	fill_days, _ := strconv.Atoi(gFedermeter.Conf.Recommendation.FillDays)
 	st, es := getTimeFromTo(nil, fill_days)
 	granularity, _ := strconv.ParseInt(gFedermeter.Conf.Recommendation.Granularity, 10, 64)
@@ -70,7 +72,21 @@ func (i inputLib) Gather() error {
 	if err != nil {
 		logger.Errorf("Failed to get nodes with error %v", err)
 	}
-	adpFed := adapterK8sToFedmeter.NewAdapterNodes(nodes.Nodes)
+
+	// Check node provider
+	for _, n := range nodes.Nodes {
+		if len(n.Provider.Provider) != 0 {
+			fedNodes = append(fedNodes, n)
+		}
+	}
+
+	if len(fedNodes) == 0 {
+		logger.Warnf(fmt.Sprintf("Current nodes did not have any provider information"))
+		return nil
+	}
+
+	logger.Infof(fmt.Sprintf("Prepare calculate nodes cost: %s", utils.InterfaceToString(fedNodes)))
+	adpFed := adapterK8sToFedmeter.NewAdapterNodes(fedNodes)
 	if gFedermeter.Conf.CostAnalysis.CalculateCurrent == true {
 		fedCal, err := adpFed.GenerateFedemeterCalculates(gFedermeter.Conf.CostAnalysis.CalculateCurrentUnit)
 		if err != nil {
