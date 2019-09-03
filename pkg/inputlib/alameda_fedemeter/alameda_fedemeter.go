@@ -216,6 +216,10 @@ func NewCostAnalyst(confPath *string, logger *logUtil.Scope) *CostAnalyst {
 	dp := DP.NewDataHubClient()
 	dp.Scope = logger
 	dp.DataHub.DataHub = fedConf.DataHub
+	if len(fedConf.Fedemeter.Username) == 0 {
+		fedConf.Fedemeter.Username = "fedemeter"
+		fedConf.Fedemeter.Password = "$6$pOwGiawPSjz7qLaN$fnMXEhwzWnUw.bOKohdAhB5K5iCCOJJaZXxQkhzH4URsHP8qLTT4QeBPUKjlOAeAHbKsqlf.fyuL2pNRmR6oQD1git"
+	}
 	fed := FedAPI.NewFedermeter(fedConf.Fedemeter.Url, fedConf.Fedemeter.Username, fedConf.Fedemeter.Password, logger)
 	return &CostAnalyst{Conf: &fedConf, Scope: logger, DPClient: dp, FedApi: fed}
 }
