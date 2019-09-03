@@ -10,6 +10,8 @@ import (
 
 	logUtil "github.com/containers-ai/alameda/pkg/utils/log"
 	"reflect"
+	"crypto/tls"
+	"time"
 )
 
 type jeriParameter struct {
@@ -25,7 +27,7 @@ func NewFedermeter(apiUrl string, username string, password string, logger *logU
 }
 
 func (f *Fedemeter) GetApiInfo() (*map[string]string, error) {
-	res, err := f.request("GET", f.apiUrl, nil, nil)
+	res, err := f.request("GET", fmt.Sprintf("%s/", f.apiUrl), nil, nil)
 	if err != nil {
 		f.logger.Errorf("Failed to get api server info, %v", err)
 		return nil, err
@@ -36,9 +38,13 @@ func (f *Fedemeter) GetApiInfo() (*map[string]string, error) {
 }
 
 func (f *Fedemeter) request(method string, url string, requestBody []byte, parameters interface{}) ([]byte, error) {
+	tr := &http.Transport{TLSClientConfig: &tls.Config{InsecureSkipVerify: true}}
 	request, err := http.NewRequest(method, url, bytes.NewBuffer(requestBody))
 	request.Header.Set("Content-Type", "application/json")
 	request.Header.Set("Accept", "application/json")
+	if len(f.user) > 0 {
+		request.SetBasicAuth(f.user, f.password)
+	}
 	if err != nil {
 		f.logger.Errorf("Failed to create request: %v", err)
 		return nil, err
@@ -71,7 +77,7 @@ func (f *Fedemeter) request(method string, url string, requestBody []byte, param
 		request.URL.RawQuery = q.Encode()
 		f.logger.Infof("request: %s", request.URL.String())
 	}
-	client := &http.Client{}
+	client := &http.Client{Timeout: 120 * time.Second, Transport: tr}
 	resp, err := client.Do(request)
 	if err != nil {
 		f.logger.Errorf("Failed to send http request with error %v", err)

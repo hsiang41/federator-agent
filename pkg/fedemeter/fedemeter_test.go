@@ -12,7 +12,7 @@ var fed *Fedemeter
 
 func init() {
 	// 54.218.143.157, 34.221.21.224
-	fed = NewFedermeter("http://54.218.143.157:31000/fedemeter-api/v1", "", "", logger)
+	fed = NewFedermeter("https://54.191.89.126/fedemeter-api/v1", "fedemeter", "$6$pOwGiawPSjz7qLaN$fnMXEhwzWnUw.bOKohdAhB5K5iCCOJJaZXxQkhzH4URsHP8qLTT4QeBPUKjlOAeAHbKsqlf.fyuL2pNRmR6oQD1", logger)
 }
 
 func TestFedermeter_GetApiInfo(t *testing.T) {
