@@ -9,6 +9,12 @@ import (
 	"encoding/json"
 )
 
+type TimeRange struct {
+	StartTime   time.Time
+	EndTime     time.Time
+	Step        time.Duration
+}
+
 func GetTimeRange(startTime *timestamp.Timestamp, endTime *timestamp.Timestamp, durationTime int32, isInit bool, step int32) *CommonLib.TimeRange {
 	if startTime == nil {
 		sTm, _ := ptypes.Timestamp(endTime)
