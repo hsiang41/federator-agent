@@ -178,8 +178,6 @@ func (i inputLib) SetAgentQueue(agentQueue *queue.Queue) {
 }
 
 func (i inputLib) Close() {
-	gFedermeter.Scope.Debugf("Free cost analyst")
-	gFedermeter = &CostAnalyst{}
 }
 
 type CostAnalyst struct {
