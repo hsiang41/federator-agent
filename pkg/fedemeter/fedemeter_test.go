@@ -12,7 +12,7 @@ var fed *Fedemeter
 
 func init() {
 	// 54.218.143.157, 34.221.21.224
-	fed = NewFedermeter("https://54.191.89.126/fedemeter-api/v1", "fedemeter", "$6$pOwGiawPSjz7qLaN$fnMXEhwzWnUw.bOKohdAhB5K5iCCOJJaZXxQkhzH4URsHP8qLTT4QeBPUKjlOAeAHbKsqlf.fyuL2pNRmR6oQD1", logger)
+	fed = NewFedermeter("http://34.223.245.164:31000/fedemeter-api/v1", "fedemeter", "$6$pOwGiawPSjz7qLaN$fnMXEhwzWnUw.bOKohdAhB5K5iCCOJJaZXxQkhzH4URsHP8qLTT4QeBPUKjlOAeAHbKsqlf.fyuL2pNRmR6oQD1", logger)
 }
 
 func TestFedermeter_GetApiInfo(t *testing.T) {
@@ -53,8 +53,8 @@ func TestFedermeter_GetRecommenderationJeri(t *testing.T) {
 	fedRcNode1 := &FedProvider{}
 	fedRcNode1.Region = "US West (Oregon)"
 	fedRcNode1.Instances = &FedInstances{}
-	fedRcNode1.Instances.Nodename = "172-23-1-8"
-	fedRcNode1.Instances.Instancetype = "t2.xlarge"
+	fedRcNode1.Instances.Nodename = "172-23-1-12"
+	fedRcNode1.Instances.Instancetype = "m5.2xlarge"
 	fedRcNode1.Instances.Nodetype = "master"
 	fedRcNode1.Instances.Operatingsystem = "Linux"
 	fedRcNode1.Instances.Preinstalledsw = "NA"
@@ -73,8 +73,8 @@ func TestFedermeter_GetRecommenderationJeri(t *testing.T) {
 	fedRcNode2 := &FedProvider{}
 	fedRcNode2.Region = "US West (Oregon)"
 	fedRcNode2.Instances = &FedInstances{}
-	fedRcNode2.Instances.Nodename = "172-23-1-65"
-	fedRcNode2.Instances.Instancetype = "t2.xlarge"
+	fedRcNode2.Instances.Nodename = "172-23-1-45"
+	fedRcNode2.Instances.Instancetype = "m5.xlarge"
 	fedRcNode2.Instances.Nodetype = "worker"
 	fedRcNode2.Instances.Operatingsystem = "Linux"
 	fedRcNode2.Instances.Preinstalledsw = "NA"
@@ -93,8 +93,8 @@ func TestFedermeter_GetRecommenderationJeri(t *testing.T) {
 	fedRcNode3 := &FedProvider{}
 	fedRcNode3.Region = "US West (Oregon)"
 	fedRcNode3.Instances = &FedInstances{}
-	fedRcNode3.Instances.Nodename = "172-23-1-60"
-	fedRcNode3.Instances.Instancetype = "t2.xlarge"
+	fedRcNode3.Instances.Nodename = "172-23-1-21"
+	fedRcNode3.Instances.Instancetype = "m5.xlarge"
 	fedRcNode3.Instances.Nodetype = "worker"
 	fedRcNode3.Instances.Operatingsystem = "Linux"
 	fedRcNode3.Instances.Preinstalledsw = "NA"
@@ -109,16 +109,37 @@ func TestFedermeter_GetRecommenderationJeri(t *testing.T) {
 	fedRcNode3Storage.Period = "1"
 	fedRcNode3.Storage = append(fedRcNode3.Storage, fedRcNode3Storage)
 
+	// Instance 4
+	fedRcNode4 := &FedProvider{}
+	fedRcNode4.Region = "US West (Oregon)"
+	fedRcNode4.Instances = &FedInstances{}
+	fedRcNode4.Instances.Nodename = "172-23-1-181"
+	fedRcNode4.Instances.Instancetype = "m5.xlarge"
+	fedRcNode4.Instances.Nodetype = "worker"
+	fedRcNode4.Instances.Operatingsystem = "Linux"
+	fedRcNode4.Instances.Preinstalledsw = "NA"
+	fedRcNode4.Instances.Instancenum = "1"
+	fedRcNode4.Instances.Period = "1"
+	fedRcNode4.Instances.Unit = "hour"
+	fedRcNode4Storage := &FedStorage{}
+	fedRcNode4Storage.Unit = "hour"
+	fedRcNode4Storage.Volumetype = "General Purpose"
+	fedRcNode4Storage.Storagesize = "50"
+	fedRcNode4Storage.Storagenum = "1"
+	fedRcNode4Storage.Period = "1"
+	fedRcNode4.Storage = append(fedRcNode4.Storage, fedRcNode4Storage)
+
 	fedRcres.Nodesinfo["aws"] = append(fedRcres.Nodesinfo["aws"], fedRcNode1)
 	fedRcres.Nodesinfo["aws"] = append(fedRcres.Nodesinfo["aws"], fedRcNode2)
 	fedRcres.Nodesinfo["aws"] = append(fedRcres.Nodesinfo["aws"], fedRcNode3)
+	fedRcres.Nodesinfo["aws"] = append(fedRcres.Nodesinfo["aws"], fedRcNode4)
 
 	fedRcJeri.Resource = append(fedRcJeri.Resource, fedRcres)
 	//fromTs := ptypes.TimestampNow()
 	//toTs := &timestamp.Timestamp{Seconds: fromTs.Seconds + (7 * 24 * int64(time.Hour/time.Second))}
 
 	fmt.Println(utils.InterfaceToString(fedRcJeri))
-	fedJreiResult, err := fed.GetRecommenderationJeri(1566457662, 1566457662, 3600, 7, fedRcJeri, true)
+	fedJreiResult, err := fed.GetRecommenderationJeri(1566457662, 1566457662, 3600, 7, fedRcJeri, false)
 	if err != nil {
 		t.Fatal(err)
 		return
