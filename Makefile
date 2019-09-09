@@ -6,7 +6,7 @@ GIT_DIRTY = $(shell git diff --quiet || echo '-dirty')
 CODE_VERSION = "$(GIT_REF)@$(GIT_COMMIT)$(GIT_DIRTY)"
 
 # Image URL to use all building/pushing image targets
-IMG ?= federatorai-agent:latest
+IMG ?= federatorai-agent
 
 SRC_DIR = $(shell pwd)
 INSTALL_ROOT = $(SRC_DIR)/install_root
@@ -130,16 +130,16 @@ generate:
 
 ## docker-build: Build the docker image.
 docker-build-alpine:
-	docker build -t ${IMG} -f Dockerfile .
+	docker build -t ${IMG}:latest -f Dockerfile .
 
 docker-build-ubi:
-	docker build -t ${IMG} -f Dockerfile.ubi .
+	docker build -t ${IMG}:latest -f Dockerfile.ubi .
 
 docker-build-ubi-fedemeter:
-	docker build -t ${IMG} -f Dockerfile.ubi.fedemeter .
+	docker build -t ${IMG}:latest -f Dockerfile.ubi.fedemeter .
 
 docker-build-ubi-gpu:
-	docker build -t ${IMG} -f Dockerfile.ubi.gpu .
+	docker build -t ${IMG}-gpu:latest -f Dockerfile.ubi.gpu .
 
 docker-build: docker-build-ubi
 

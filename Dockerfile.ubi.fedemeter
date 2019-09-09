@@ -15,7 +15,7 @@ RUN make build_fedemeter
 FROM registry.access.redhat.com/ubi7/ubi-minimal
 ENV SUMMARY="Federator.ai Agent transmit metrics data to the Alameda server."	\
     DESCRIPTION="Federator.ai Agent transmit metrics data to the Alameda server." \
-    NAME="Federator.ai Agent" \
+    NAME="Federator.ai Agent Fedemeter Calculator" \
     VERSION="latest" \
     USER_UID=1001 \
     USER_NAME=alameda \

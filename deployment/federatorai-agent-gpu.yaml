@@ -1,0 +1,127 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: federatorai-agent-gpu-config
+  namespace: federatorai-operator
+data:
+  transmitter.toml: |-
+    [log]
+     set-logcallers = false
+     output-level = "debug" # debug, info, warn, error, fatal, none
+
+    [input_jobs]
+        [input_jobs.gpucollection]
+        name = "gpu_collection"
+        schedule-spec = "@every 3m"
+        lib-path = "./lib/inputlib/prometheusgpu.so"
+        lib-configuration = "/etc/alameda/federatorai-agent/input/influx_prometheus.toml"
+
+  influx_prometheus.toml: |
+    [global]
+    interval = 300
+
+    [target]
+    datatype = "influx"
+    address = ""
+    port = ""
+    username = ""
+    password = ""
+    database = "alameda_gpu"
+
+    [datasource]
+    [datasource.influx]
+    datatype = "influx"
+    address = "http://127.0.0.1:18086"
+    port = ""
+    username = ""
+    password = ""
+    database = "gpu_counting"
+
+    [[datasource.influx.measurement]]
+    name = "gpu_counting_k8s"
+    expr = "select * from k8s"
+    tags = ["NodeName", "Poding", "PodName", "ProjCode", "ProjCreator", "ProjType", "img_type", "namespace", "prj_type", "resource", "type"]
+    [datasource.influx.measurement.element.value]
+    type = "float"
+
+    [datasource.prometheus]
+    datatype = "prometheus"
+    address = "http://127.0.0.1:19090"
+    port = ""
+    username = ""
+    password = ""
+
+    [[datasource.prometheus.measurement]]
+    name = "nvidia_gpu_duty_cycle"
+    expr = "nvidia_gpu_duty_cycle"
+    tags = ["host", "instance", "job", "name", "uuid"]
+    [datasource.prometheus.measurement.element.value]
+    type = "float"
+
+    [[datasource.prometheus.measurement]]
+    name = "nvidia_gpu_num_devices"
+    expr = "nvidia_gpu_num_devices"
+    tags = ["host", "instance", "job"]
+    [datasource.prometheus.measurement.element.value]
+    type = "float"
+
+    [[datasource.prometheus.measurement]]
+    name = "nvidia_gpu_memory_used_bytes"
+    expr = "nvidia_gpu_memory_used_bytes"
+    tags = ["host", "instance", "job", "name", "uuid"]
+    [datasource.prometheus.measurement.element.value]
+    type = "float"
+
+    [[datasource.prometheus.measurement]]
+    name = "nvidia_gpu_memory_total_bytes"
+    expr = "nvidia_gpu_memory_total_bytes"
+    tags = ["host", "instance", "job", "name", "uuid"]
+    [datasource.prometheus.measurement.element.value]
+    type = "float"
+
+    [[datasource.prometheus.measurement]]
+    name = "nvidia_gpu_temperature_celsius"
+    expr = "nvidia_gpu_temperature_celsius"
+    tags = ["host", "instance", "job", "name", "uuid"]
+    [datasource.prometheus.measurement.element.value]
+    type = "float"
+
+    [[datasource.prometheus.measurement]]
+    name = "nvidia_gpu_power_usage_milliwatts"
+    expr = "nvidia_gpu_power_usage_milliwatts"
+    tags = ["host", "instance", "job", "name", "uuid"]
+    [datasource.prometheus.measurement.element.value]
+    type = "float"
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: federatorai-gpu-agent
+  namespace: federatorai-operator
+spec:
+  selector:
+    matchLabels:
+      app: federatorai-gpu-agent
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: federatorai-gpu-agent
+    spec:
+      containers:
+      - name: federatorai-gpu-agent
+        image: docker-registry.default.svc:5000/federatorai-agent/federatorai-agent-gpu:latest
+        imagePullPolicy: Always
+        volumeMounts:
+          - name: federatorai-agent-gpu-config
+            mountPath: /etc/alameda/federatorai-agent/transmitter.toml
+            subPath: transmitter.toml
+          - name: federatorai-agent-gpu-config
+            mountPath: /etc/alameda/federatorai-agent/input/influx_prometheus.toml
+            subPath: influx_prometheus.toml
+      volumes:
+        - name: federatorai-agent-config
+          configMap:
+            name: federatorai-agent-config
