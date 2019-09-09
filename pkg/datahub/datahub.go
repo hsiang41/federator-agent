@@ -64,7 +64,6 @@ func (d *DataHubClient) WriteRawData(rawData *datahubV1a1pha1.WriteRawdataReques
 
 	rep, err := datapipeClient.WriteRawdata(context.Background(), rawData)
 	if err != nil {
-		d.Scope.Error(fmt.Sprintf("Failed to write raw datas, %v", err))
 		return err
 	}
 	if rep.Code != 0 {

@@ -13,7 +13,7 @@ database = "alameda_gpu"
 [datasource]
 [datasource.influx]
 datatype = "influx"
-address = "http://127.0.0.1:18086"
+address = "http://127.0.0.1:8086"
 port = ""
 username = ""
 password = ""
@@ -22,13 +22,14 @@ database = "gpu_counting"
 [[datasource.influx.measurement]]
 name = "gpu_counting_k8s"
 expr = "select * from k8s"
+last_seconds = "300"
 tags = ["NodeName", "Poding", "PodName", "ProjCode", "ProjCreator", "ProjType", "img_type", "namespace", "prj_type", "resource", "type"]
 [datasource.influx.measurement.element.value]
 type = "float"
 
 [datasource.prometheus]
 datatype = "prometheus"
-address = "http://127.0.0.1:19090"
+address = "http://127.0.0.1:9090"
 port = ""
 username = ""
 password = ""

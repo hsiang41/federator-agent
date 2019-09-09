@@ -14,11 +14,11 @@ import (
 	"github.com/containers-ai/federatorai-agent/pkg/influxConvert"
 	"github.com/containers-ai/federatorai-agent/pkg"
 	"github.com/containers-ai/federatorai-agent/pkg/utils"
-	"time"
-	"github.com/containers-ai/federatorai-agent/pkg/client/prometheus"
-	"github.com/containers-ai/federatorai-agent/pkg/influxConvert/prometheus"
 	"github.com/containers-ai/federatorai-agent/pkg/influxConvert/influx"
 	"github.com/containers-ai/federatorai-agent/pkg/datahub"
+	"github.com/containers-ai/federatorai-agent/pkg/influxConvert/prometheus"
+	"time"
+	"github.com/containers-ai/federatorai-agent/pkg/client/prometheus"
 )
 
 var gCollector *collector
@@ -42,6 +42,7 @@ type Measurement struct {
 	Name string `mapstructure:"name"`
 	Expr string `mapstructure:"expr"`
 	Tags []string `mapstructure:"tags"`
+	LastSeconds string `mapstructure:"last_seconds"`
 	Element map[string]element
 }
 
@@ -124,22 +125,26 @@ func (c *collector) Gather() error {
 		case "influx":
 			for _, m := range dv.Measurements {
 				var rawResponse influx.InfluxResp
-				expr := fmt.Sprintf("%s where time > now() - %ds order by time asc", m.Expr, c.Config.Global.Interval)
+				expr := fmt.Sprintf("%s where time > now() - %ss order by time asc", m.Expr, m.LastSeconds)
+				//expr := fmt.Sprintf("%s order by time desc limit 10", m.Expr)
+				c.Logger.Infof("expr: %s", expr)
 				dbClient := ClientInflux.NewClientInflux(dv.Address, dv.Database, ClientInflux.MethodQuery, expr)
 				result, err := dbClient.Execute()
 				if err != nil {
 					c.Logger.Errorf("Failed to query %s with %v", m.Name, err)
 					continue
 				}
+				c.Logger.Infof("result: %s", utils.InterfaceToString(result))
 				err = json.Unmarshal([]byte(result), &rawResponse)
 				if err != nil {
 					c.Logger.Errorf("Unable to parse influx measurement %s, %v", m.Name, err)
 					c.Logger.Errorf("result: %s", result)
 					continue
 				}
+				c.Logger.Debugf("Start to write raw data %s, %s", dv.Database, utils.InterfaceToString(rawResponse))
 				err = c.writeRawData(m.Name, m.Tags, &m.Element, &rawResponse, common.ConvertInflux)
 				if err != nil {
-					c.Logger.Errorf("Failed tp convert %s result to raw data with %v", m.Name, err)
+					c.Logger.Errorf("Failed tp write %s result to raw data with %v", m.Name, err)
 					continue
 				}
 				c.Logger.Infof("Succeed to write raw data %s", m.Name)
@@ -168,9 +173,10 @@ func (c *collector) Gather() error {
 					c.Logger.Errorf("result: %s", result)
 					continue
 				}
+				c.Logger.Debugf("Start to write raw data %s, %s", dv.Database, utils.InterfaceToString(rawResponse))
 				err = c.writeRawData(m.Name, m.Tags, &m.Element, &rawResponse, common.ConvertPrometheus)
 				if err != nil {
-					c.Logger.Errorf("Failed tp convert %s result to raw data with %v", m.Name, err)
+					c.Logger.Errorf("Failed tp write %s result to raw data with %v", m.Name, err)
 					continue
 				}
 				c.Logger.Infof("Succeed to write raw data %s", m.Name)
