@@ -1,4 +1,4 @@
-package influx_federmeter
+package influx_fedemeter
 
 import (
 	"testing"

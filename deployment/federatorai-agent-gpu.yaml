@@ -13,7 +13,7 @@ data:
         [input_jobs.gpucollection]
         name = "gpu_collection"
         schedule-spec = "@every 3m"
-        lib-path = "./lib/inputlib/prometheusgpu.so"
+        lib-path = "/lib/inputlib/prometheusgpu.so"
         lib-configuration = "/etc/alameda/federatorai-agent/input/influx_prometheus.toml"
 
   influx_prometheus.toml: |

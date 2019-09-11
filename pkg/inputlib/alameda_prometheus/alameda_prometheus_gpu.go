@@ -134,7 +134,7 @@ func (c *collector) Gather() error {
 					c.Logger.Errorf("Failed to query %s with %v", m.Name, err)
 					continue
 				}
-				c.Logger.Infof("result: %s", utils.InterfaceToString(result))
+				c.Logger.Debugf("result: %s", utils.InterfaceToString(result))
 				err = json.Unmarshal([]byte(result), &rawResponse)
 				if err != nil {
 					c.Logger.Errorf("Unable to parse influx measurement %s, %v", m.Name, err)
@@ -176,7 +176,7 @@ func (c *collector) Gather() error {
 				c.Logger.Debugf("Start to write raw data %s, %s", dv.Database, utils.InterfaceToString(rawResponse))
 				err = c.writeRawData(m.Name, m.Tags, &m.Element, &rawResponse, common.ConvertPrometheus)
 				if err != nil {
-					c.Logger.Errorf("Failed tp write %s result to raw data with %v", m.Name, err)
+					// c.Logger.Errorf("Failed to write %s result to raw data with %v", m.Name, err)
 					continue
 				}
 				c.Logger.Infof("Succeed to write raw data %s", m.Name)
