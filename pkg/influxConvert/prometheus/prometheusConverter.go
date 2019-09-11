@@ -70,8 +70,8 @@ func (d *prometheusConverter) GetWriteRequest() (*v1alpha1.WriteRawdataRequest, 
 		}
 		fields["time"] =  v.Time.Format(time.RFC3339Nano)
 		// addColumns(&rawData.Columns, "time")
-		fields["Value"] = v.Value
-		addColumns(&rawData.Columns, "Value")
+		fields["value"] = v.Value
+		addColumns(&rawData.Columns, "value")
 		pDatas = append(pDatas, &fields)
 	}
 
