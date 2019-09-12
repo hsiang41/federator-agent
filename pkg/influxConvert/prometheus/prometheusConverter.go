@@ -64,8 +64,14 @@ func (d *prometheusConverter) GetWriteRequest() (*v1alpha1.WriteRawdataRequest, 
 		// metricsName := labels[:strings.Index(labels, "{")]
 		labelEntry := strings.Split(labels[strings.Index(labels, "{")+1: len(labels) -1], ",")
 		for _, v := range labelEntry {
+			if len(v) == 0 {
+				continue
+			}
 			value := strings.Split(v, "=")
-			fields[strings.TrimSpace(value[0])] = strings.Replace(value[1], "\"", "", -1)
+			if len(value) == 0 {
+				continue
+			}
+ 			fields[strings.TrimSpace(value[0])] = strings.Replace(value[1], "\"", "", -1)
 			addColumns(&rawData.Columns, strings.TrimSpace(value[0]))
 		}
 		fields["time"] =  v.Time.Format(time.RFC3339Nano)

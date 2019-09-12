@@ -11,22 +11,6 @@ password = ""
 database = "alameda_gpu"
 
 [datasource]
-[datasource.influx]
-datatype = "influx"
-address = "http://127.0.0.1:8086"
-port = ""
-username = ""
-password = ""
-database = "gpu_counting"
-
-[[datasource.influx.measurement]]
-name = "gpu_counting_k8s"
-expr = "select * from k8s"
-last_seconds = "300"
-tags = ["NodeName", "PodImg", "PodName", "ProjCode", "ProjCreator", "ProjType", "img_type", "namespace", "prj_type", "resource", "type"]
-[datasource.influx.measurement.element.value]
-type = "float"
-
 [datasource.prometheus]
 datatype = "prometheus"
 address = "http://127.0.0.1:19090"
@@ -38,41 +22,53 @@ password = ""
 name = "nvidia_gpu_duty_cycle"
 expr = "nvidia_gpu_duty_cycle"
 tags = ["host", "instance", "job", "name", "uuid"]
-[datasource.prometheus.measurement.element.Value]
+[datasource.prometheus.measurement.element.value]
 type = "float"
 
 [[datasource.prometheus.measurement]]
 name = "nvidia_gpu_num_devices"
 expr = "nvidia_gpu_num_devices"
 tags = ["host", "instance", "job"]
-[datasource.prometheus.measurement.element.Value]
+[datasource.prometheus.measurement.element.value]
 type = "float"
 
 [[datasource.prometheus.measurement]]
 name = "nvidia_gpu_memory_used_bytes"
 expr = "nvidia_gpu_memory_used_bytes"
 tags = ["host", "instance", "job", "name", "uuid"]
-[datasource.prometheus.measurement.element.Value]
+[datasource.prometheus.measurement.element.value]
 type = "float"
 
 [[datasource.prometheus.measurement]]
 name = "nvidia_gpu_memory_total_bytes"
 expr = "nvidia_gpu_memory_total_bytes"
 tags = ["host", "instance", "job", "name", "uuid"]
-[datasource.prometheus.measurement.element.Value]
+[datasource.prometheus.measurement.element.value]
 type = "float"
 
 [[datasource.prometheus.measurement]]
 name = "nvidia_gpu_temperature_celsius"
 expr = "nvidia_gpu_temperature_celsius"
 tags = ["host", "instance", "job", "name", "uuid"]
-[datasource.prometheus.measurement.element.Value]
+[datasource.prometheus.measurement.element.value]
 type = "float"
 
 [[datasource.prometheus.measurement]]
 name = "nvidia_gpu_power_usage_milliwatts"
 expr = "nvidia_gpu_power_usage_milliwatts"
 tags = ["host", "instance", "job", "name", "uuid"]
-[datasource.prometheus.measurement.element.Value]
+[datasource.prometheus.measurement.element.value]
 type = "float"
 
+[[datasource.prometheus.measurement]]
+name = "overall_gpu_memory_utilizatin"
+expr = "sum(nvidia_gpu_memory_used_bytes) / sum(nvidia_gpu_memory_total_bytes)"
+[datasource.prometheus.measurement.element.value]
+type = "float"
+
+[[datasource.prometheus.measurement]]
+name = "nodes_of_gpu_memory_utilization"
+expr = "sum(nvidia_gpu_memory_used_bytes) by (host) / sum(nvidia_gpu_memory_total_bytes) by (host)"
+tags = ["host"]
+[datasource.prometheus.measurement.element.value]
+type = "float"
