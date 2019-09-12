@@ -152,11 +152,22 @@ func (c *collector) Gather() error {
 		case "prometheus":
 			for _, m := range dv.Measurements {
 				var rawResponse prometheus.PrometheusMetrics
+				var step string
 				tm := utils.TimeRange{}
 				tm.EndTime = time.Now()
-				td, _ := time.ParseDuration(fmt.Sprintf("-%ds", c.Config.Global.Interval))
-				tm.StartTime = tm.EndTime.Add(td)
-				tm.Step, _ = time.ParseDuration(fmt.Sprintf("%ds", 30))
+				if len(m.LastSeconds) > 0 {
+					step = fmt.Sprintf("%ds", m.LastSeconds)
+				} else {
+					step = fmt.Sprintf("%ds", c.Config.Global.Interval)
+				}
+				if step == "1s" {
+					tm.StartTime = tm.EndTime
+					tm.Step, _ = time.ParseDuration(fmt.Sprintf("%s", step))
+				} else {
+					td, _ := time.ParseDuration(fmt.Sprintf("-%s", step))
+					tm.StartTime = tm.EndTime.Add(td)
+					tm.Step, _ = time.ParseDuration(fmt.Sprintf("%s", step))
+				}
 				expr := m.Expr
 				dbClient := ClientPrometheus.NewClientPrometheus(dv.Address, ClientPrometheus.MethodQueryRange, expr, &tm)
 				result, err := dbClient.Execute()
