@@ -156,7 +156,7 @@ func (c *collector) Gather() error {
 				tm := utils.TimeRange{}
 				tm.EndTime = time.Now()
 				if len(m.LastSeconds) > 0 {
-					step = fmt.Sprintf("%ds", m.LastSeconds)
+					step = fmt.Sprintf("%ss", m.LastSeconds)
 				} else {
 					step = fmt.Sprintf("%ds", c.Config.Global.Interval)
 				}
