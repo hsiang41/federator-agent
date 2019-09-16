@@ -9,6 +9,7 @@ import (
 	"github.com/sheerun/queue"
 	"github.com/spf13/viper"
 	DataHubCommon "github.com/containers-ai/api/common"
+	v1alpha1 "github.com/containers-ai/api/alameda_api/v1alpha1/datahub"
 	logUtil "github.com/containers-ai/alameda/pkg/utils/log"
 	"github.com/containers-ai/federatorai-agent/pkg/client/influx"
 	"github.com/containers-ai/federatorai-agent/pkg/influxConvert"
@@ -116,6 +117,7 @@ func (c *collector) writeRawData (measurementName string, tags []string, fields 
 	err = dp.WriteRawData(rawDatas)
 
 	c.Logger.Debugf(utils.InterfaceToString(rawDatas))
+	rawDatas = &v1alpha1.WriteRawdataRequest{}
 	return err
 }
 
