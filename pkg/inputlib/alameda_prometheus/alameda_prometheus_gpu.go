@@ -20,6 +20,8 @@ import (
 	"github.com/containers-ai/federatorai-agent/pkg/influxConvert/prometheus"
 	"time"
 	"github.com/containers-ai/federatorai-agent/pkg/client/prometheus"
+	"github.com/google/uuid"
+	"os"
 )
 
 var gCollector *collector
@@ -121,6 +123,19 @@ func (c *collector) writeRawData (measurementName string, tags []string, fields 
 	return err
 }
 
+func (c *collector) notifyEvent(eventLevel v1alpha1.EventLevel, message string, data string) error {
+	hostName, _ := os.Hostname()
+	dp := datahub.NewDataHubClient()
+	dp.SetDataPipeAddress(c.Config.Target.Address)
+	err := dp.SendNotifyEvent(uuid.New().String(), "",
+		&v1alpha1.EventSource{Host: hostName, Component: "federatorai-agent"},
+		v1alpha1.EventType_EVENT_TYPE_EMAIL_NOTIFICATION, eventLevel, nil, message, data)
+	if err != nil {
+		c.Logger.Errorf("Failed to send notification: %s %s", message, data)
+	}
+	return err
+}
+
 func (c *collector) Gather() error {
 	for _, dv := range c.Config.DataSource {
 		switch strings.ToLower(dv.DataType) {
@@ -133,7 +148,9 @@ func (c *collector) Gather() error {
 				dbClient := ClientInflux.NewClientInflux(dv.Address, dv.Database, ClientInflux.MethodQuery, expr)
 				result, err := dbClient.Execute()
 				if err != nil {
-					c.Logger.Errorf("Failed to query %s with %v", m.Name, err)
+					message := fmt.Sprintf("Failed to query %s with %v", m.Name, err)
+					c.Logger.Errorf(message)
+					c.notifyEvent(v1alpha1.EventLevel_EVENT_LEVEL_ERROR, message, "")
 					continue
 				}
 				c.Logger.Debugf("result: %s", utils.InterfaceToString(result))
@@ -174,7 +191,9 @@ func (c *collector) Gather() error {
 				dbClient := ClientPrometheus.NewClientPrometheus(dv.Address, ClientPrometheus.MethodQueryRange, expr, &tm)
 				result, err := dbClient.Execute()
 				if err != nil {
-					c.Logger.Errorf("Failed to query %s with %v", m.Name, err)
+					message := fmt.Sprintf("Failed to query %s with %v", m.Name, err)
+					c.Logger.Errorf(message)
+					c.notifyEvent(v1alpha1.EventLevel_EVENT_LEVEL_ERROR, message, "")
 					continue
 				}
 				if len(result) == 0 || strings.ToLower(result) == "none" {
