@@ -16,6 +16,7 @@ import (
 	InputLib "github.com/containers-ai/federatorai-agent/pkg/inputlib"
 	OutputLib "github.com/containers-ai/federatorai-agent/pkg/outputlib"
 	Queue "github.com/sheerun/queue"
+	"sync"
 )
 
 const (
@@ -36,6 +37,8 @@ var (
 		},
 	}
 )
+
+var mutex sync.Mutex
 
 func init() {
 	flag.StringVar(&transmitterConfigurationFile, "config", "/etc/alameda/federatorai-agent/transmitter.toml", "File path to transmitter configuration")
@@ -91,6 +94,8 @@ func NewScheduleJob(libPath string, configPath string, libType LibType) *Schedul
 
 func (s *ScheduleJob) Run() {
 	var symName string
+	mutex.Lock()
+	logger.Debugf("Require locker")
 	p, err := plugin.Open(s.LibPath)
 	if err != nil {
 		logger.Errorf(fmt.Sprintf("Failed to open library: %v", err))
@@ -136,6 +141,8 @@ func (s *ScheduleJob) Run() {
 		libObj.Write()
 
 	}
+	mutex.Unlock()
+	logger.Debugf("Require unlocker")
 }
 
 func startAgent() {

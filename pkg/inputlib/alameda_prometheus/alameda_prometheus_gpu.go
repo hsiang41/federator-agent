@@ -22,6 +22,8 @@ import (
 	"github.com/containers-ai/federatorai-agent/pkg/client/prometheus"
 	"github.com/google/uuid"
 	"os"
+	"net"
+	"io/ioutil"
 )
 
 var gCollector *collector
@@ -100,6 +102,41 @@ func NewCollector(config *string, scope *logUtil.Scope) *collector {
 		return &collector{Config: agentConf, Logger: scope}
 	}
 	return nil
+}
+
+func (c *collector) HealthCheck() {
+	var port string
+	var address string
+	if len(c.Config.DataSource) <= 0 {
+		ioutil.WriteFile("status", []byte("0"), 0777)
+		return
+	}
+	for _, v := range c.Config.DataSource {
+		if len(v.Port) > 0 {
+			port = v.Port
+			address = v.Address
+		} else {
+			port = strings.Split(v.Address, ":")[0]
+			address = strings.Split(v.Address, ":")[1]
+		}
+		if len(address) >= 7 && address[0:7] == "http://" {
+			address = address[7:]
+		}
+		if len(address) >= 8 && address[0:8] == "https://" {
+			address = address[8:]
+		}
+		conn, err := net.Dial("tcp", fmt.Sprintf("%s:%s", address, port))
+		if err != nil {
+			c.Logger.Errorf("Failed to connect datasource server: %s with %v", fmt.Sprintf("%s:%s", address, port), err)
+			ioutil.WriteFile("status", []byte("0"), 0777)
+			return
+		}
+		defer conn.Close()
+	}
+	err := ioutil.WriteFile("status", []byte("1"), 0777)
+	if err != nil {
+		c.Logger.Errorf("Failed to write agent running status with %v", err)
+	}
 }
 
 func (c *collector) writeRawData (measurementName string, tags []string, fields *map[string]element, sourceData interface{}, convertType common.ConvertInt) error {
