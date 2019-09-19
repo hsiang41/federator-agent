@@ -42,6 +42,9 @@ var mutex sync.Mutex
 
 func init() {
 	flag.StringVar(&transmitterConfigurationFile, "config", "/etc/alameda/federatorai-agent/transmitter.toml", "File path to transmitter configuration")
+	logOpt := log.DefaultOptions()
+	logOpt.RotationMaxBackups = 10
+	log.Configure(logOpt)
 	// flag.StringVar(&transmitterConfigurationFile, "config", "/root/goProject/src/github.com/containers-ai/federatorai-agent/etc/transmitter.toml", "File path to transmitter configuration")
 }
 
