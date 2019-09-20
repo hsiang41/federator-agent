@@ -20,10 +20,12 @@ enum EventType {
     EVENT_TYPE_POD_PREDICTION_CREATE        = 12;
     EVENT_TYPE_VPA_RECOMMENDATION_CREATE    = 13;
     EVENT_TYPE_HPA_RECOMMENDATION_CREATE    = 14;
-    EVENT_TYPE_POD_EVICT                    = 15;
-    EVENT_TYPE_POD_PATCH                    = 16;
+    EVENT_TYPE_VPA_RECOMMENDATION_EXECUTE   = 15;
+    EVENT_TYPE_HPA_RECOMMENDATION_EXECUTE   = 16;
     EVENT_TYPE_ANOMALY_METRIC_DETECT        = 17;
     EVENT_TYPE_ANOMALY_ANALYSIS_CREATE      = 18;
+    EVENT_TYPE_LICENSE                      = 19;
+    EVENT_TYPE_EMAIL_NOTIFICATION           = 20;
 }
 
 enum EventVersion {
@@ -51,6 +53,7 @@ message K8SObjectReference {
     string name        = 3;
     string api_version = 4;
 }
+
 message Event {
     google.protobuf.Timestamp time       = 1;
     string                    id         = 2;

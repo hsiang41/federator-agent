@@ -89,7 +89,6 @@ func converJson(i model.Value) string {
 	case model.ValMatrix:
 		var pVectors []PVector
 		v, _ := i.(model.Matrix)
-		fmt.Println("Matrix:", utils.InterfaceToString(v))
 		for _, m := range v {
 			for _, j := range m.Values {
 				p := PVector{j.Timestamp.Time(), m.Metric.String(), j.Value.String()}

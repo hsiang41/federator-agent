@@ -1,17 +1,17 @@
-package influx_federmeter
+package influx_fedemeter
 
 import (
+	"encoding/json"
 	"fmt"
 	"strings"
 	"reflect"
 
+	"google.golang.org/grpc/status"
+	"google.golang.org/grpc/codes"
 	v1alpha1 "github.com/containers-ai/api/alameda_api/v1alpha1/datahub"
 	"github.com/containers-ai/api/common"
 	"github.com/containers-ai/federatorai-agent/pkg/fedemeter"
 	"github.com/golang/protobuf/ptypes/timestamp"
-	"google.golang.org/grpc/status"
-	"google.golang.org/grpc/codes"
-	"encoding/json"
 )
 
 type EnumMeasurementID int32

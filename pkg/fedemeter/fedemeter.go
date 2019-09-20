@@ -75,7 +75,6 @@ func (f *Fedemeter) request(method string, url string, requestBody []byte, param
 			q.Add(refK.Field(i).Name, value)
 		}
 		request.URL.RawQuery = q.Encode()
-		f.logger.Infof("request: %s", request.URL.String())
 	}
 	client := &http.Client{Timeout: 120 * time.Second, Transport: tr}
 	resp, err := client.Do(request)
