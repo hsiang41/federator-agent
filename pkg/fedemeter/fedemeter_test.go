@@ -153,20 +153,19 @@ func TestFedermeter_GetRecommenderationJeri(t *testing.T) {
 
 func TestFedermeter_Calculate(t *testing.T) {
 	fedProviders := &FedProviders{}
-	// Instance 1
 	fedRcNode1 := &FedProvider{}
 	fedRcNode1.Region = "US West (Oregon)"
 	fedRcNode1.Instances = &FedInstances{}
-	fedRcNode1.Instances.Nodename = "172-23-1-8"
-	fedRcNode1.Instances.Instancetype = "t2.xlarge"
+	fedRcNode1.Instances.Nodename = "172-23-1-41"
+	fedRcNode1.Instances.Instancetype = "t2.medium"
 	fedRcNode1.Instances.Nodetype = "master"
 	fedRcNode1.Instances.Operatingsystem = "Linux"
 	fedRcNode1.Instances.Preinstalledsw = "NA"
 	fedRcNode1.Instances.Instancenum = "1"
 	fedRcNode1.Instances.Period = "1"
-	fedRcNode1.Instances.Unit = "month"
+	fedRcNode1.Instances.Unit = "hour"
 	fedRcNode1Storage := &FedStorage{}
-	fedRcNode1Storage.Unit = "month"
+	fedRcNode1Storage.Unit = "hour"
 	fedRcNode1Storage.Volumetype = "General Purpose"
 	fedRcNode1Storage.Storagesize = "50"
 	fedRcNode1Storage.Storagenum = "1"
@@ -177,16 +176,16 @@ func TestFedermeter_Calculate(t *testing.T) {
 	fedRcNode2 := &FedProvider{}
 	fedRcNode2.Region = "US West (Oregon)"
 	fedRcNode2.Instances = &FedInstances{}
-	fedRcNode2.Instances.Nodename = "172-23-1-65"
-	fedRcNode2.Instances.Instancetype = "t2.xlarge"
+	fedRcNode2.Instances.Nodename = "172-23-1-59"
+	fedRcNode2.Instances.Instancetype = "c4.xlarge"
 	fedRcNode2.Instances.Nodetype = "worker"
 	fedRcNode2.Instances.Operatingsystem = "Linux"
 	fedRcNode2.Instances.Preinstalledsw = "NA"
 	fedRcNode2.Instances.Instancenum = "1"
 	fedRcNode2.Instances.Period = "1"
-	fedRcNode2.Instances.Unit = "month"
+	fedRcNode2.Instances.Unit = "hour"
 	fedRcNode2Storage := &FedStorage{}
-	fedRcNode2Storage.Unit = "month"
+	fedRcNode2Storage.Unit = "hour"
 	fedRcNode2Storage.Volumetype = "General Purpose"
 	fedRcNode2Storage.Storagesize = "50"
 	fedRcNode2Storage.Storagenum = "1"
@@ -197,16 +196,16 @@ func TestFedermeter_Calculate(t *testing.T) {
 	fedRcNode3 := &FedProvider{}
 	fedRcNode3.Region = "US West (Oregon)"
 	fedRcNode3.Instances = &FedInstances{}
-	fedRcNode3.Instances.Nodename = "172-23-1-60"
-	fedRcNode3.Instances.Instancetype = "t2.xlarge"
+	fedRcNode3.Instances.Nodename = "172-23-1-51"
+	fedRcNode3.Instances.Instancetype = "c4.xlarge"
 	fedRcNode3.Instances.Nodetype = "worker"
 	fedRcNode3.Instances.Operatingsystem = "Linux"
 	fedRcNode3.Instances.Preinstalledsw = "NA"
 	fedRcNode3.Instances.Instancenum = "1"
 	fedRcNode3.Instances.Period = "1"
-	fedRcNode3.Instances.Unit = "month"
+	fedRcNode3.Instances.Unit = "hour"
 	fedRcNode3Storage := &FedStorage{}
-	fedRcNode3Storage.Unit = "month"
+	fedRcNode3Storage.Unit = "hour"
 	fedRcNode3Storage.Volumetype = "General Purpose"
 	fedRcNode3Storage.Storagesize = "50"
 	fedRcNode3Storage.Storagenum = "1"

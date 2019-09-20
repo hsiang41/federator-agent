@@ -1,9 +1,6 @@
 package fedemeter
 
 import (
-	"time"
-	"context"
-	"math"
 	"bytes"
 	"encoding/json"
 	"fmt"
@@ -12,9 +9,11 @@ import (
 	"net/http"
 	"reflect"
 	"crypto/tls"
-
 	logUtil "github.com/containers-ai/alameda/pkg/utils/log"
 	"github.com/containers-ai/federatorai-agent/pkg/utils"
+	"time"
+	"context"
+	"math"
 )
 
 type jeriParameter struct {

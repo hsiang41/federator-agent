@@ -180,6 +180,37 @@ func (i inputLib) Gather() error {
 		return err
 	}
 
+	iHistoricalCostNamespaceMeasurement := FedRaw.NewInfluxMeasurement("alameda_fedemeter", 5, nil, nil, fedHistoryCostResp, granularity, false)
+	fedHistoricalNamespaceCostRawData, err := iHistoricalCostNamespaceMeasurement.GetWriteRequest(&timestamp.Timestamp{Seconds: tm.Seconds, Nanos: tm.Nanos})
+	if err != nil {
+		logger.Error(fmt.Sprintf("Failed to generate historical cost related on namespaces %v", err))
+		return err
+	}
+	logger.Debugf("Historical cost related on namespaces raw data: %s", utils.InterfaceToString(fedHistoricalNamespaceCostRawData))
+
+	err = gFedermeter.DPClient.WriteRawData(fedHistoricalNamespaceCostRawData)
+	if err != nil {
+		logger.Error(fmt.Sprintf("Failed to write fedemeter historical cost related on namespaces %v", err))
+		return err
+	}
+	logger.Info(fmt.Sprintf("Succeed to write historical cost related on namespaces fill_dys: %d, start time: %d, granularity: %d", fill_days, st, granularity))
+
+	// app
+	iHistoricalCostAppMeasurement := FedRaw.NewInfluxMeasurement("alameda_fedemeter", 6, nil, nil, fedHistoryCostResp, granularity, false)
+	fedHistoricalAppCostRawData, err := iHistoricalCostAppMeasurement.GetWriteRequest(&timestamp.Timestamp{Seconds: tm.Seconds, Nanos: tm.Nanos})
+	if err != nil {
+		logger.Error(fmt.Sprintf("Failed to generate historical cost related on app %v", err))
+		return err
+	}
+	logger.Debugf("Historical cost related on namespaces raw data: %s", utils.InterfaceToString(fedHistoricalAppCostRawData))
+
+	err = gFedermeter.DPClient.WriteRawData(fedHistoricalAppCostRawData)
+	if err != nil {
+		logger.Error(fmt.Sprintf("Failed to write fedemeter historical cost related on app %v", err))
+		return err
+	}
+	logger.Info(fmt.Sprintf("Succeed to write fedemeter historical cost related on app fill_dys: %d, start time: %d, granularity: %d", fill_days, st, granularity))
+
 	// Generate predicted cost analysis
 	fedPredictionCostReq, err := adpFed.GenerateFedemeterCostRequest("", "predictions", "workload", "hour")
 	if err != nil {
@@ -192,6 +223,37 @@ func (i inputLib) Gather() error {
 		logger.Error(fmt.Sprintf("Failed to get fedemeter prediction (%d) cost %v", granularity, err))
 		return err
 	}
+
+	iPredictedCostNamespaceMeasurement := FedRaw.NewInfluxMeasurement("alameda_fedemeter", 3, nil, nil, fedPredictionCostResp, granularity, false)
+	fedPredictedNamespaceCostRawData, err := iPredictedCostNamespaceMeasurement.GetWriteRequest(&timestamp.Timestamp{Seconds: tm.Seconds, Nanos: tm.Nanos})
+	if err != nil {
+		logger.Error(fmt.Sprintf("Failed to generate predicted cost related on namespaces %v", err))
+		return err
+	}
+	logger.Debugf("Predicted cost related on namespaces raw data: %s", utils.InterfaceToString(fedPredictedNamespaceCostRawData))
+
+	err = gFedermeter.DPClient.WriteRawData(fedPredictedNamespaceCostRawData)
+	if err != nil {
+		logger.Error(fmt.Sprintf("Failed to write fedemeter predicted cost related on namespaces %v", err))
+		return err
+	}
+	logger.Info(fmt.Sprintf("Succeed to write predicted cost related on namespaces fill_dys: %d, start time: %d, granularity: %d", fill_days, st, granularity))
+
+	// app
+	iPredictedCostAppMeasurement := FedRaw.NewInfluxMeasurement("alameda_fedemeter", 4, nil, nil, fedPredictionCostResp, granularity, false)
+	fedPredictedAppCostRawData, err := iPredictedCostAppMeasurement.GetWriteRequest(&timestamp.Timestamp{Seconds: tm.Seconds, Nanos: tm.Nanos})
+	if err != nil {
+		logger.Error(fmt.Sprintf("Failed to generate predicted cost related on app %v", err))
+		return err
+	}
+	logger.Debugf("Predicted cost related on namespaces raw data: %s", utils.InterfaceToString(fedPredictedAppCostRawData))
+
+	err = gFedermeter.DPClient.WriteRawData(fedPredictedAppCostRawData)
+	if err != nil {
+		logger.Error(fmt.Sprintf("Failed to write fedemeter predicted cost related on app %v", err))
+		return err
+	}
+	logger.Info(fmt.Sprintf("Succeed to write fedemeter predicted cost related on app fill_dys: %d, start time: %d, granularity: %d", fill_days, st, granularity))
 
 	return nil
 }

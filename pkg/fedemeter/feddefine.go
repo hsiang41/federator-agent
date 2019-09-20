@@ -62,8 +62,8 @@ type fedProvidersResp struct {
 		Unit            string  `json:"unit"`
 		Description     string  `json:"description"`
 		Cost            float64 `json:"cost"`
-		CPU             int     `json:"cpu"`
-		Memory          int     `json:"memory"`
+		CPU             float64 `json:"cpu"`
+		Memory          float64 `json:"memory"`
 		Displayname     string  `json:"displayname"`
 	} `json:"instances"`
 	Storage []struct {
@@ -228,7 +228,7 @@ type FedRecommendationJeriResp struct {
 type FedCostMetricResp struct {
 	Cluster struct {
 		Clustername string `json:"clustername"`
-		Provider    struct {
+		Providers   [] struct {
 			Providername string `json:"providername"`
 			Namespace    []struct {
 				Namespacename string `json:"namespacename"`
@@ -237,16 +237,16 @@ type FedCostMetricResp struct {
 					Costpercentage string `json:"costpercentage"`
 					Timestampe     int64  `json:"timestampe"`
 				} `json:"costs"`
-				App []struct {
+				Apps []struct {
 					Appname string `json:"appname"`
 					Costs   []struct {
 						Workloadcost   string `json:"workloadcost"`
 						Costpercentage string `json:"costpercentage"`
 						Timestampe     int64  `json:"timestampe"`
 					} `json:"costs"`
-				} `json:"app"`
+				} `json:"apps"`
 			} `json:"namespace"`
-		} `json:"provider"`
+		} `json:"providers"`
 	} `json:"cluster"`
 	Count      int  `json:"count"`
 	Limit      int  `json:"limit"`

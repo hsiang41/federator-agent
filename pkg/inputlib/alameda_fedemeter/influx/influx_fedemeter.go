@@ -504,20 +504,23 @@ func (n *InfluxMeasurement) generateCostNamespace(starttime *timestamp.Timestamp
 	souceData := n.SourceData.(*fedemeter.FedCostMetricResp)
 
 	clusterName := souceData.Cluster.Clustername
-	provider := souceData.Cluster.Provider.Providername
-	for _, namespace := range souceData.Cluster.Provider.Namespace {
-		for _, cost := range namespace.Costs {
-			namespacesName := namespace.Namespacename
-			workloadCost, _ := strconv.ParseFloat(cost.Workloadcost, 64)
-			costPercentage, _ := strconv.ParseFloat(cost.Costpercentage, 64)
-			costNamespace := &costNamespace{ClusterName: clusterName, Provider: provider, NamespaceName: namespacesName, WorkloadCost: workloadCost, CostPercentage: costPercentage, Time: cost.Timestampe * n.Granularity}
-			costNamespaces = append(costNamespaces, costNamespace)
+	for _, p := range souceData.Cluster.Providers {
+		provider := p.Providername
+		for _, namespace := range p.Namespace {
+			for _, cost := range namespace.Costs {
+				namespacesName := namespace.Namespacename
+				workloadCost, _ := strconv.ParseFloat(cost.Workloadcost, 64)
+				costPercentage, _ := strconv.ParseFloat(cost.Costpercentage, 64)
+				costNamespace := &costNamespace{ClusterName: clusterName, Provider: provider, NamespaceName: namespacesName, WorkloadCost: workloadCost, CostPercentage: costPercentage, Time: cost.Timestampe * n.Granularity, Granularity: n.Granularity}
+				costNamespaces = append(costNamespaces, costNamespace)
+			}
 		}
 	}
 
 	if costNamespaces == nil || len(costNamespaces) == 0 {
 		return nil, nil
 	}
+
 
 	// Reformat to influx data fields
 	var wrRawData v1alpha1.WriteRawdataRequest
@@ -567,6 +570,7 @@ func (n *InfluxMeasurement) generateCostNamespace(starttime *timestamp.Timestamp
 			var value string
 			if rk.Field(i).Name == "Time" {
 				rawValus.Time = &timestamp.Timestamp{Seconds: rv.FieldByName(rk.Field(i).Name).Int()}
+				continue
 			}
 			switch rv.FieldByName(rk.Field(i).Name).Kind() {
 			case reflect.Int, reflect.Int64:
@@ -588,7 +592,7 @@ func (n *InfluxMeasurement) generateCostNamespace(starttime *timestamp.Timestamp
 		wrRawData.Rawdata = rawDatas
 	}
 
-	return nil, nil
+	return &wrRawData, nil
 }
 
 func (n *InfluxMeasurement) generateCostApp(starttime *timestamp.Timestamp) (*v1alpha1.WriteRawdataRequest, error) {
@@ -605,16 +609,18 @@ func (n *InfluxMeasurement) generateCostApp(starttime *timestamp.Timestamp) (*v1
 	souceData := n.SourceData.(*fedemeter.FedCostMetricResp)
 
 	clusterName := souceData.Cluster.Clustername
-	provider := souceData.Cluster.Provider.Providername
-	for _, namespace := range souceData.Cluster.Provider.Namespace {
-		for _, app := range namespace.App {
-			appName := app.Appname
-			for _, cost := range app.Costs {
-				namespacesName := namespace.Namespacename
-				workloadCost, _ := strconv.ParseFloat(cost.Workloadcost, 64)
-				costPercentage, _ := strconv.ParseFloat(cost.Costpercentage, 64)
-				costApp := &costApp{ClusterName: clusterName, Provider: provider, NamespaceName: namespacesName, WorkloadCost: workloadCost, CostPercentage: costPercentage, Time: cost.Timestampe * n.Granularity, AppName: appName}
-				costApps = append(costApps, costApp)
+	for _, p := range souceData.Cluster.Providers {
+		provider := p.Providername
+		for _, namespace := range p.Namespace {
+			for _, app := range namespace.Apps {
+				appName := app.Appname
+				for _, cost := range app.Costs {
+					namespacesName := namespace.Namespacename
+					workloadCost, _ := strconv.ParseFloat(cost.Workloadcost, 64)
+					costPercentage, _ := strconv.ParseFloat(cost.Costpercentage, 64)
+					costApp := &costApp{ClusterName: clusterName, Provider: provider, NamespaceName: namespacesName, WorkloadCost: workloadCost, CostPercentage: costPercentage, Time: cost.Timestampe * n.Granularity, AppName: appName, Granularity: n.Granularity}
+					costApps = append(costApps, costApp)
+				}
 			}
 		}
 	}
@@ -693,7 +699,7 @@ func (n *InfluxMeasurement) generateCostApp(starttime *timestamp.Timestamp) (*v1
 		wrRawData.Rawdata = rawDatas
 	}
 
-	return nil, nil
+	return &wrRawData, nil
 }
 
 func (n *InfluxMeasurement)GetWriteRequest(starttime *timestamp.Timestamp) (*v1alpha1.WriteRawdataRequest, error) {

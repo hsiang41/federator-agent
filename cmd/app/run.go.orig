@@ -43,7 +43,10 @@ var mutex sync.Mutex
 func init() {
 	flag.StringVar(&transmitterConfigurationFile, "config", "/etc/alameda/federatorai-agent/transmitter.toml", "File path to transmitter configuration")
 	logOpt := log.DefaultOptions()
+<<<<<<< HEAD
+=======
 	logOpt.OutputPaths = []string{"/var/log/alameda/agent.log"}
+>>>>>>> agent_gpu
 	logOpt.RotationMaxBackups = 10
 	log.Configure(logOpt)
 	// flag.StringVar(&transmitterConfigurationFile, "config", "/root/goProject/src/github.com/containers-ai/federatorai-agent/etc/transmitter.toml", "File path to transmitter configuration")
@@ -67,6 +70,7 @@ func ReadConfig(filename string) (*Agent.Config, error) {
 		logLev, ok := log.StringToLevel(agentConfig.Log.OutputLevel)
 		fmt.Println(logger, ok, agentConfig.Log.OutputLevel)
 		logger.SetOutputLevel(logLev)
+		fmt.Println("Set debug level")
 		if transmitterConfBin, err := json.MarshalIndent(agentConfig, "", "  "); err == nil {
 			logger.Debug(fmt.Sprintf("Transmitter configuration: %s", string(transmitterConfBin)))
 		}
@@ -126,7 +130,7 @@ func (s *ScheduleJob) Run() {
 			return
 		}
 		defer libObj.Close()
-		logger.Debugf(fmt.Sprintf("Load config: %s", s.ConfigPath))
+		//logger.Debugf(fmt.Sprintf("Load config: %s", s.ConfigPath))
 		libObj.LoadConfig(&s.ConfigPath, logger)
 		libObj.SetAgentQueue(agentQueue)
 		libObj.Gather()
