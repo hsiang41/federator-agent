@@ -24,7 +24,6 @@ func TestDataHubClient_GetNodes(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	fmt.Println(utils.InterfaceToString(node))
 }
 
 func TestDataHubClient_SendNotifyEvent(t *testing.T) {
