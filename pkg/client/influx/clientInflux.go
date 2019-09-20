@@ -5,7 +5,6 @@ import (
 	"google.golang.org/grpc/status"
 	"github.com/influxdata/influxdb/client/v2"
 	"github.com/containers-ai/federatorai-agent/pkg/utils"
-	"fmt"
 )
 
 type MethodInt int
@@ -35,7 +34,6 @@ func (n *ClientInflux) Execute() (string, error) {
 	defer c.Close()
 	switch n.Method {
 	case MethodQuery:
-		fmt.Println("Query")
 		return query(&c, n.Database, n.Expr)
 	case MethodWrite:
 		return "", status.Error(codes.Unimplemented, "Not implemented")
@@ -47,7 +45,6 @@ func query(c *client.Client, database string, expr string) (string, error) {
 	q := client.NewQuery(expr, database, "")
 	response, err := (*c).Query(q)
 	if err != nil {
-		fmt.Println("Error", err)
 		return "", err
 	}
 	if response.Error() != nil {

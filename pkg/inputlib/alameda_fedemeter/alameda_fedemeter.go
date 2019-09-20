@@ -207,7 +207,7 @@ func NewCostAnalyst(confPath *string, logger *logUtil.Scope) *CostAnalyst {
 		if _, err := json.MarshalIndent(fedConf, "", "  "); err == nil {
 			// scope.Debugf(fmt.Sprintf("Input library fedemeter cost analysis configuration: %s", string(transmitterConfBin)))
 		} else {
-			fmt.Printf("failed to display fedemeter cost analysis configuration")
+			logger.Errorf("failed to display fedemeter cost analysis configuration")
 		}
 	}
 

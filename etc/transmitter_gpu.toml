@@ -1,10 +1,10 @@
 [log]
  set-logcallers = false
- output-level = "debug" # debug, info, warn, error, fatal, none
+ output-level = "info" # debug, info, warn, error, fatal, none
 
 [input_jobs]
     [input_jobs.gpucollection]
     name = "gpu_collection"
-    schedule-spec = "@every 3m"
+    schedule-spec = "@every 30s"
     lib-path = "./lib/inputlib/prometheusgpu.so"
     lib-configuration = "/etc/alameda/federatorai-agent/input/influx_prometheus.toml"

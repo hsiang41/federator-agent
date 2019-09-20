@@ -76,10 +76,7 @@ func (d *influxConverter) GetWriteRequest() (*v1alpha1.WriteRawdataRequest, erro
 			continue
 		}
 		rawData.Columns = v.Columns[1:]
-		for i, c := range rawData.Columns {
-			if i == 0 {
-				continue
-			}
+		for _, c := range rawData.Columns {
 			if n.IsTagKey(c) == true {
 				metricColumnsTypes = append(metricColumnsTypes, v1alpha1common.ColumnType_COLUMNTYPE_TAG)
 				metricDataTypes = append(metricDataTypes, v1alpha1common.DataType_DATATYPE_STRING)
