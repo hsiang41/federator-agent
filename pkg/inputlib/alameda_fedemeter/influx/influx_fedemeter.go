@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"strings"
 	"reflect"
+	"strconv"
 
 	"google.golang.org/grpc/status"
 	"google.golang.org/grpc/codes"
@@ -19,7 +20,11 @@ type EnumMeasurementID int32
 var EnumMeasurementName = map[EnumMeasurementID]string {
 	0: "calculate_instance",
 	1: "calculate_storage",
-	2: "recommendation_jeri"}
+	2: "recommendation_jeri",
+	3: "prediction_cost_namespace",
+	4: "prediction_cost_app",
+	5: "history_cost_namespace",
+	6: "history_cost_app"}
 
 var MeasurementColumns map[EnumMeasurementID][]string
 
@@ -28,7 +33,11 @@ func init() {
 	MeasurementColumns[0] = []string{"starttime", "provider", "nodename", "unit", "instancetype", "cpu", "memory", "totalcost", "displayname", "instancenum", "region", "description", "cost", "granularity"}
 	MeasurementColumns[1] = []string{"starttime", "nodename", "volumetype", "unit", "storagesize", "description", "cost", "displayname", "granularity"}
 	MeasurementColumns[2] = []string{"starttime", "resourcename", "provider", "granularity", "region", "instancetype", "totalcost", "masternum", "workernum", "masterstoragesize", "workerstoragesize", "ondemandnum", "revservedinstances",
-	"displayname", "master_ri_num", "worker_ri_num", "master_ondemand_num", "worker_ondemand_num"}
+		"displayname", "master_ri_num", "worker_ri_num", "master_ondemand_num", "worker_ondemand_num"}
+	MeasurementColumns[3] = []string{"clustername", "provider", "namespacesname", "workloadcost", "costpercentage", "granularity"}
+	MeasurementColumns[4] = []string{"clustername", "provider", "namespacesname", "appname", "workloadcost", "costpercentage", "granularity"}
+	MeasurementColumns[5] = []string{"clustername", "provider", "namespacesname", "workloadcost", "costpercentage", "granularity"}
+	MeasurementColumns[6] = []string{"clustername", "provider", "namespacesname", "appname", "workloadcost", "costpercentage", "granularity"}
 }
 
 type InfluxField struct {
@@ -67,6 +76,28 @@ type recommendatioinJeri struct {
 	WorkerOndemandNum int
 	DisplayName       string
 }
+
+type costNamespace struct {
+	ClusterName     string
+	Provider        string
+	NamespaceName   string
+	WorkloadCost    float64
+	CostPercentage  float64
+	Granularity     int64
+	Time            int64
+}
+
+type costApp struct {
+	ClusterName     string
+	Provider        string
+	NamespaceName   string
+	AppName         string
+	WorkloadCost    float64
+	CostPercentage  float64
+	Granularity     int64
+	Time            int64
+}
+
 
 func NewInfluxMeasurement(databaseName string, measurementID EnumMeasurementID, tags []string, fields []*InfluxField, sourceData interface{}, granularity int64, revservedinstances bool) *InfluxMeasurement {
 	return &InfluxMeasurement{
@@ -459,6 +490,212 @@ func (n *InfluxMeasurement)generateCalculateRecommendation(starttime *timestamp.
 	return &wrRawData, nil
 }
 
+func (n *InfluxMeasurement) generateCostNamespace(starttime *timestamp.Timestamp) (*v1alpha1.WriteRawdataRequest, error) {
+	var costNamespaces []*costNamespace
+	n.TagKeys = []string {"clustername", "provider", "namespacename", "granularity"}
+	if n.FieldKeys == nil {
+		n.FieldKeys = make([]*InfluxField, 0)
+	}
+	n.FieldKeys = append(n.FieldKeys, &InfluxField{"workloadcost", common.DataType_DATATYPE_FLOAT64, nil})
+	n.FieldKeys = append(n.FieldKeys, &InfluxField{"costpercentage", common.DataType_DATATYPE_FLOAT64, nil})
+	if n.SourceData == nil {
+		return nil, status.Error(codes.Unavailable, "Unable to parse data source")
+	}
+	souceData := n.SourceData.(*fedemeter.FedCostMetricResp)
+
+	clusterName := souceData.Cluster.Clustername
+	provider := souceData.Cluster.Provider.Providername
+	for _, namespace := range souceData.Cluster.Provider.Namespace {
+		for _, cost := range namespace.Costs {
+			namespacesName := namespace.Namespacename
+			workloadCost, _ := strconv.ParseFloat(cost.Workloadcost, 64)
+			costPercentage, _ := strconv.ParseFloat(cost.Costpercentage, 64)
+			costNamespace := &costNamespace{ClusterName: clusterName, Provider: provider, NamespaceName: namespacesName, WorkloadCost: workloadCost, CostPercentage: costPercentage, Time: cost.Timestampe * n.Granularity}
+			costNamespaces = append(costNamespaces, costNamespace)
+		}
+	}
+
+	if costNamespaces == nil || len(costNamespaces) == 0 {
+		return nil, nil
+	}
+
+	// Reformat to influx data fields
+	var wrRawData v1alpha1.WriteRawdataRequest
+	var rawDatas []*common.WriteRawdata
+	var rawData common.WriteRawdata
+
+	wrRawData.DatabaseType = common.DatabaseType_INFLUXDB
+	// Set DatabaseName and MeasurementName
+	rawData.Table = EnumMeasurementName[n.MeasurementID]
+	rawData.Database = n.DatabaseName
+	initialMeasurementField := 0
+	for _, d := range costNamespaces {
+		rk := reflect.TypeOf(d).Elem()
+		rv := reflect.ValueOf(d).Elem()
+		if initialMeasurementField == 0 {
+			var metricColumnsTypes []common.ColumnType
+			var metricDataTypes []common.DataType
+			for i := 0; i < rk.NumField(); i++ {
+				// Set Influx tags
+				if rk.Field(i).Name == "Time" {
+					continue
+				}
+				if n.isTagKey(rk.Field(i).Name) == true {
+					metricColumnsTypes = append(metricColumnsTypes, common.ColumnType_COLUMNTYPE_TAG)
+					metricDataTypes = append(metricDataTypes, common.DataType_DATATYPE_STRING)
+					rawData.Columns = append(rawData.Columns, strings.ToLower(rk.Field(i).Name))
+					continue
+				}
+				// Set Influx fields
+				metricColumnsTypes = append(metricColumnsTypes, common.ColumnType_COLUMNTYPE_FIELD)
+				iField := n.getFieldKey(rk.Field(i).Name)
+				if iField == nil {
+					metricDataTypes = append(metricDataTypes, common.DataType_DATATYPE_STRING)
+				} else {
+					metricDataTypes = append(metricDataTypes, iField.Type)
+				}
+				rawData.Columns = append(rawData.Columns, strings.ToLower(rk.Field(i).Name))
+			}
+
+			rawData.ColumnTypes = metricColumnsTypes
+			rawData.DataTypes = metricDataTypes
+			initialMeasurementField = 1
+		}
+		// Set raw data
+		var rawValus common.Row
+		for i := 0; i< rk.NumField(); i++ {
+			var value string
+			if rk.Field(i).Name == "Time" {
+				rawValus.Time = &timestamp.Timestamp{Seconds: rv.FieldByName(rk.Field(i).Name).Int()}
+			}
+			switch rv.FieldByName(rk.Field(i).Name).Kind() {
+			case reflect.Int, reflect.Int64:
+				value = fmt.Sprintf("%d", rv.FieldByName(rk.Field(i).Name).Int())
+			case reflect.Float64, reflect.Float32:
+				value = fmt.Sprintf("%f", rv.FieldByName(rk.Field(i).Name).Float())
+			default:
+				value = rv.FieldByName(rk.Field(i).Name).String()
+			}
+			rawValus.Values = append(rawValus.Values, value)
+		}
+		// append total cost
+		rawData.Rows = append(rawData.Rows, &rawValus)
+	}
+	if len(rawData.Rows) > 0 {
+		rawDatas = append(rawDatas, &rawData)
+	}
+	if len(rawDatas) > 0 {
+		wrRawData.Rawdata = rawDatas
+	}
+
+	return nil, nil
+}
+
+func (n *InfluxMeasurement) generateCostApp(starttime *timestamp.Timestamp) (*v1alpha1.WriteRawdataRequest, error) {
+	var costApps []*costApp
+	n.TagKeys = []string {"clustername", "provider", "namespacename", "granularity"}
+	if n.FieldKeys == nil {
+		n.FieldKeys = make([]*InfluxField, 0)
+	}
+	n.FieldKeys = append(n.FieldKeys, &InfluxField{"workloadcost", common.DataType_DATATYPE_FLOAT64, nil})
+	n.FieldKeys = append(n.FieldKeys, &InfluxField{"costpercentage", common.DataType_DATATYPE_FLOAT64, nil})
+	if n.SourceData == nil {
+		return nil, status.Error(codes.Unavailable, "Unable to parse data source")
+	}
+	souceData := n.SourceData.(*fedemeter.FedCostMetricResp)
+
+	clusterName := souceData.Cluster.Clustername
+	provider := souceData.Cluster.Provider.Providername
+	for _, namespace := range souceData.Cluster.Provider.Namespace {
+		for _, app := range namespace.App {
+			appName := app.Appname
+			for _, cost := range app.Costs {
+				namespacesName := namespace.Namespacename
+				workloadCost, _ := strconv.ParseFloat(cost.Workloadcost, 64)
+				costPercentage, _ := strconv.ParseFloat(cost.Costpercentage, 64)
+				costApp := &costApp{ClusterName: clusterName, Provider: provider, NamespaceName: namespacesName, WorkloadCost: workloadCost, CostPercentage: costPercentage, Time: cost.Timestampe * n.Granularity, AppName: appName}
+				costApps = append(costApps, costApp)
+			}
+		}
+	}
+
+	if costApps == nil || len(costApps) == 0 {
+		return nil, nil
+	}
+
+	// Reformat to influx data fields
+	var wrRawData v1alpha1.WriteRawdataRequest
+	var rawDatas []*common.WriteRawdata
+	var rawData common.WriteRawdata
+
+	wrRawData.DatabaseType = common.DatabaseType_INFLUXDB
+	// Set DatabaseName and MeasurementName
+	rawData.Table = EnumMeasurementName[n.MeasurementID]
+	rawData.Database = n.DatabaseName
+	initialMeasurementField := 0
+	for _, d := range costApps {
+		rk := reflect.TypeOf(d).Elem()
+		rv := reflect.ValueOf(d).Elem()
+		if initialMeasurementField == 0 {
+			var metricColumnsTypes []common.ColumnType
+			var metricDataTypes []common.DataType
+			for i := 0; i < rk.NumField(); i++ {
+				// Set Influx tags
+				if rk.Field(i).Name == "Time" {
+					continue
+				}
+				if n.isTagKey(rk.Field(i).Name) == true {
+					metricColumnsTypes = append(metricColumnsTypes, common.ColumnType_COLUMNTYPE_TAG)
+					metricDataTypes = append(metricDataTypes, common.DataType_DATATYPE_STRING)
+					rawData.Columns = append(rawData.Columns, strings.ToLower(rk.Field(i).Name))
+					continue
+				}
+				// Set Influx fields
+				metricColumnsTypes = append(metricColumnsTypes, common.ColumnType_COLUMNTYPE_FIELD)
+				iField := n.getFieldKey(rk.Field(i).Name)
+				if iField == nil {
+					metricDataTypes = append(metricDataTypes, common.DataType_DATATYPE_STRING)
+				} else {
+					metricDataTypes = append(metricDataTypes, iField.Type)
+				}
+				rawData.Columns = append(rawData.Columns, strings.ToLower(rk.Field(i).Name))
+			}
+
+			rawData.ColumnTypes = metricColumnsTypes
+			rawData.DataTypes = metricDataTypes
+			initialMeasurementField = 1
+		}
+		// Set raw data
+		var rawValus common.Row
+		for i := 0; i< rk.NumField(); i++ {
+			var value string
+			if rk.Field(i).Name == "Time" {
+				rawValus.Time = &timestamp.Timestamp{Seconds: rv.FieldByName(rk.Field(i).Name).Int()}
+				continue
+			}
+			switch rv.FieldByName(rk.Field(i).Name).Kind() {
+			case reflect.Int, reflect.Int64:
+				value = fmt.Sprintf("%d", rv.FieldByName(rk.Field(i).Name).Int())
+			case reflect.Float64, reflect.Float32:
+				value = fmt.Sprintf("%f", rv.FieldByName(rk.Field(i).Name).Float())
+			default:
+				value = rv.FieldByName(rk.Field(i).Name).String()
+			}
+			rawValus.Values = append(rawValus.Values, value)
+		}
+		// append total cost
+		rawData.Rows = append(rawData.Rows, &rawValus)
+	}
+	if len(rawData.Rows) > 0 {
+		rawDatas = append(rawDatas, &rawData)
+	}
+	if len(rawDatas) > 0 {
+		wrRawData.Rawdata = rawDatas
+	}
+
+	return nil, nil
+}
+
 func (n *InfluxMeasurement)GetWriteRequest(starttime *timestamp.Timestamp) (*v1alpha1.WriteRawdataRequest, error) {
 	switch n.MeasurementID {
 	case 0:
@@ -467,6 +704,10 @@ func (n *InfluxMeasurement)GetWriteRequest(starttime *timestamp.Timestamp) (*v1a
 		return n.generateCalculateStorage(starttime)
 	case 2:
 		return n.generateCalculateRecommendation(starttime)
+	case 3, 5:
+		return n.generateCostNamespace(starttime)
+	case 4, 6:
+		return n.generateCostApp(starttime)
 	}
 	return nil, status.Error(codes.Unimplemented, fmt.Sprintf("Unimplment measurement id %d", n.MeasurementID))
 }

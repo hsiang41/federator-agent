@@ -3,6 +3,9 @@ package fedemeter
 import (
 	"fmt"
 	"testing"
+	"time"
+	"github.com/golang/protobuf/ptypes"
+	"github.com/golang/protobuf/ptypes/timestamp"
 	logUtil "github.com/containers-ai/alameda/pkg/utils/log"
 	"github.com/containers-ai/federatorai-agent/pkg/utils"
 )
@@ -12,7 +15,8 @@ var fed *Fedemeter
 
 func init() {
 	// 54.218.143.157, 34.221.21.224
-	fed = NewFedermeter("http://34.223.245.164:31000/fedemeter-api/v1", "fedemeter", "$6$pOwGiawPSjz7qLaN$fnMXEhwzWnUw.bOKohdAhB5K5iCCOJJaZXxQkhzH4URsHP8qLTT4QeBPUKjlOAeAHbKsqlf.fyuL2pNRmR6oQD1", logger)
+	logger.SetOutputLevel(logUtil.DebugLevel)
+	fed = NewFedermeter("http://52.12.208.57:31000/fedemeter-api/v1", "fedemeter", "$6$pOwGiawPSjz7qLaN$fnMXEhwzWnUw.bOKohdAhB5K5iCCOJJaZXxQkhzH4URsHP8qLTT4QeBPUKjlOAeAHbKsqlf.fyuL2pNRmR6oQD1", logger)
 }
 
 func TestFedermeter_GetApiInfo(t *testing.T) {
@@ -222,5 +226,174 @@ func TestFedermeter_Calculate(t *testing.T) {
 		return
 	}
 	logger.Infof("Calculate Result: %s", utils.InterfaceToString(fedCalculateResult))
+}
 
+func TestFedemeter_GetCostHistorical(t *testing.T) {
+	var costReq FedCostMetricReq
+	var costReqResource FedCostMetricResource
+	costReqResource.Category = "historical"
+	costReqResource.Type = "workload"
+	costReqResource.Clustername = "Dark Dew"
+	costReqResource.Nodesinfo = make(map[string][]*FedProvider)
+
+	fedRcNode1 := &FedProvider{}
+	fedRcNode1.Region = "US West (Oregon)"
+	fedRcNode1.Instances = &FedInstances{}
+	fedRcNode1.Instances.Nodename = "172-23-1-17"
+	fedRcNode1.Instances.Instancetype = "c4.xlarge"
+	fedRcNode1.Instances.Nodetype = "worker"
+	fedRcNode1.Instances.Operatingsystem = "Linux"
+	fedRcNode1.Instances.Preinstalledsw = "NA"
+	fedRcNode1.Instances.Instancenum = "1"
+	fedRcNode1.Instances.Period = "1"
+	fedRcNode1.Instances.Unit = "hour"
+	fedRcNode1Storage := &FedStorage{}
+	fedRcNode1Storage.Unit = "hour"
+	fedRcNode1Storage.Volumetype = "General Purpose"
+	fedRcNode1Storage.Storagesize = "50"
+	fedRcNode1Storage.Storagenum = "1"
+	fedRcNode1Storage.Period = "1"
+	fedRcNode1.Storage = append(fedRcNode1.Storage, fedRcNode1Storage)
+
+	// Instance 2
+	fedRcNode2 := &FedProvider{}
+	fedRcNode2.Region = "US West (Oregon)"
+	fedRcNode2.Instances = &FedInstances{}
+	fedRcNode2.Instances.Nodename = "172-23-1-29"
+	fedRcNode2.Instances.Instancetype = "c4.xlarge"
+	fedRcNode2.Instances.Nodetype = "worker"
+	fedRcNode2.Instances.Operatingsystem = "Linux"
+	fedRcNode2.Instances.Preinstalledsw = "NA"
+	fedRcNode2.Instances.Instancenum = "1"
+	fedRcNode2.Instances.Period = "1"
+	fedRcNode2.Instances.Unit = "hour"
+	fedRcNode2Storage := &FedStorage{}
+	fedRcNode2Storage.Unit = "hour"
+	fedRcNode2Storage.Volumetype = "General Purpose"
+	fedRcNode2Storage.Storagesize = "50"
+	fedRcNode2Storage.Storagenum = "1"
+	fedRcNode2Storage.Period = "1"
+	fedRcNode2.Storage = append(fedRcNode2.Storage, fedRcNode2Storage)
+
+	// Instance 3
+	fedRcNode3 := &FedProvider{}
+	fedRcNode3.Region = "US West (Oregon)"
+	fedRcNode3.Instances = &FedInstances{}
+	fedRcNode3.Instances.Nodename = "172-23-1-200"
+	fedRcNode3.Instances.Instancetype = "t2.medium"
+	fedRcNode3.Instances.Nodetype = "worker"
+	fedRcNode3.Instances.Operatingsystem = "Linux"
+	fedRcNode3.Instances.Preinstalledsw = "NA"
+	fedRcNode3.Instances.Instancenum = "1"
+	fedRcNode3.Instances.Period = "1"
+	fedRcNode3.Instances.Unit = "hour"
+	fedRcNode3Storage := &FedStorage{}
+	fedRcNode3Storage.Unit = "hour"
+	fedRcNode3Storage.Volumetype = "General Purpose"
+	fedRcNode3Storage.Storagesize = "50"
+	fedRcNode3Storage.Storagenum = "1"
+	fedRcNode3Storage.Period = "1"
+	fedRcNode3.Storage = append(fedRcNode3.Storage, fedRcNode3Storage)
+
+	costReqResource.Nodesinfo["aws"] = append(costReqResource.Nodesinfo["aws"], fedRcNode1)
+	costReqResource.Nodesinfo["aws"] = append(costReqResource.Nodesinfo["aws"], fedRcNode2)
+	costReqResource.Nodesinfo["aws"] = append(costReqResource.Nodesinfo["aws"], fedRcNode3)
+
+	costReq.Resource = append(costReq.Resource, &costReqResource)
+
+	toTs, _ := ptypes.TimestampProto(time.Now())
+	fromTs := &timestamp.Timestamp{Seconds: toTs.Seconds - int64(24 * 60 * 60)}
+
+	fmt.Println(utils.InterfaceToString(costReq))
+	fedJreiResult, err := fed.GetCostHistorical(fromTs.Seconds, toTs.Seconds, 3600, &costReq)
+	if err != nil {
+		t.Fatal(err)
+		return
+	}
+	logger.Infof("Cost historical result: %s", utils.InterfaceToString(fedJreiResult))
+}
+
+func TestFedemeter_GetCostPredicted(t *testing.T) {
+	var costReq FedCostMetricReq
+	var costReqResource FedCostMetricResource
+	costReqResource.Category = "historical"
+	costReqResource.Type = "workload"
+	costReqResource.Clustername = "Dark Dew"
+	costReqResource.Nodesinfo = make(map[string][]*FedProvider)
+
+	fedRcNode1 := &FedProvider{}
+	fedRcNode1.Region = "US West (Oregon)"
+	fedRcNode1.Instances = &FedInstances{}
+	fedRcNode1.Instances.Nodename = "172-23-1-41"
+	fedRcNode1.Instances.Instancetype = "t2.medium"
+	fedRcNode1.Instances.Nodetype = "master"
+	fedRcNode1.Instances.Operatingsystem = "Linux"
+	fedRcNode1.Instances.Preinstalledsw = "NA"
+	fedRcNode1.Instances.Instancenum = "1"
+	fedRcNode1.Instances.Period = "1"
+	fedRcNode1.Instances.Unit = "hour"
+	fedRcNode1Storage := &FedStorage{}
+	fedRcNode1Storage.Unit = "hour"
+	fedRcNode1Storage.Volumetype = "General Purpose"
+	fedRcNode1Storage.Storagesize = "50"
+	fedRcNode1Storage.Storagenum = "1"
+	fedRcNode1Storage.Period = "1"
+	fedRcNode1.Storage = append(fedRcNode1.Storage, fedRcNode1Storage)
+
+	// Instance 2
+	fedRcNode2 := &FedProvider{}
+	fedRcNode2.Region = "US West (Oregon)"
+	fedRcNode2.Instances = &FedInstances{}
+	fedRcNode2.Instances.Nodename = "172-23-1-59"
+	fedRcNode2.Instances.Instancetype = "c4.xlarge"
+	fedRcNode2.Instances.Nodetype = "worker"
+	fedRcNode2.Instances.Operatingsystem = "Linux"
+	fedRcNode2.Instances.Preinstalledsw = "NA"
+	fedRcNode2.Instances.Instancenum = "1"
+	fedRcNode2.Instances.Period = "1"
+	fedRcNode2.Instances.Unit = "hour"
+	fedRcNode2Storage := &FedStorage{}
+	fedRcNode2Storage.Unit = "hour"
+	fedRcNode2Storage.Volumetype = "General Purpose"
+	fedRcNode2Storage.Storagesize = "50"
+	fedRcNode2Storage.Storagenum = "1"
+	fedRcNode2Storage.Period = "1"
+	fedRcNode2.Storage = append(fedRcNode2.Storage, fedRcNode2Storage)
+
+	// Instance 3
+	fedRcNode3 := &FedProvider{}
+	fedRcNode3.Region = "US West (Oregon)"
+	fedRcNode3.Instances = &FedInstances{}
+	fedRcNode3.Instances.Nodename = "172-23-1-51"
+	fedRcNode3.Instances.Instancetype = "c4.xlarge"
+	fedRcNode3.Instances.Nodetype = "worker"
+	fedRcNode3.Instances.Operatingsystem = "Linux"
+	fedRcNode3.Instances.Preinstalledsw = "NA"
+	fedRcNode3.Instances.Instancenum = "1"
+	fedRcNode3.Instances.Period = "1"
+	fedRcNode3.Instances.Unit = "hour"
+	fedRcNode3Storage := &FedStorage{}
+	fedRcNode3Storage.Unit = "hour"
+	fedRcNode3Storage.Volumetype = "General Purpose"
+	fedRcNode3Storage.Storagesize = "50"
+	fedRcNode3Storage.Storagenum = "1"
+	fedRcNode3Storage.Period = "1"
+	fedRcNode3.Storage = append(fedRcNode3.Storage, fedRcNode3Storage)
+
+	costReqResource.Nodesinfo["aws"] = append(costReqResource.Nodesinfo["aws"], fedRcNode1)
+	costReqResource.Nodesinfo["aws"] = append(costReqResource.Nodesinfo["aws"], fedRcNode2)
+	costReqResource.Nodesinfo["aws"] = append(costReqResource.Nodesinfo["aws"], fedRcNode3)
+
+	costReq.Resource = append(costReq.Resource, &costReqResource)
+
+	fromTs, _ := ptypes.TimestampProto(time.Now())
+	toTs := &timestamp.Timestamp{Seconds: fromTs.Seconds + int64(24 * 60 * 60)}
+
+	fmt.Println(utils.InterfaceToString(costReq))
+	fedJreiResult, err := fed.GetCostPredicted(fromTs.Seconds, toTs.Seconds, 3600, &costReq)
+	if err != nil {
+		t.Fatal(err)
+		return
+	}
+	logger.Infof("Cost prediction result: %s", utils.InterfaceToString(fedJreiResult))
 }

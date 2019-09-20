@@ -164,6 +164,35 @@ func (i inputLib) Gather() error {
 		}
 		logger.Info(fmt.Sprintf("Succeed to write recommendation fill_dys: %d, start time: %d, granularity: %d, ri calculate: %v", fill_days, st, granularity, enableRi))
 	}
+
+	// Generate historical cost analysis
+	fedHistoryCostReq, err := adpFed.GenerateFedemeterCostRequest("", "historical", "workload", "hour")
+	if err != nil {
+		logger.Error(fmt.Sprintf("Failed to generate fedemeter historical cost request format %v", err))
+		return err
+	}
+
+	hTs := st - granularity
+	hEs := st
+	fedHistoryCostResp, err := gFedermeter.FedApi.GetCostHistorical(hTs, hEs, granularity, fedHistoryCostReq)
+	if err != nil {
+		logger.Error(fmt.Sprintf("Failed to get fedemeter historical cost %v", err))
+		return err
+	}
+
+	// Generate predicted cost analysis
+	fedPredictionCostReq, err := adpFed.GenerateFedemeterCostRequest("", "predictions", "workload", "hour")
+	if err != nil {
+		logger.Error(fmt.Sprintf("Failed to generate fedemeter historical cost request format %v", err))
+		return err
+	}
+
+	fedPredictionCostResp, err := gFedermeter.FedApi.GetCostHistorical(st, es, granularity, fedPredictionCostReq)
+	if err != nil {
+		logger.Error(fmt.Sprintf("Failed to get fedemeter prediction (%d) cost %v", granularity, err))
+		return err
+	}
+
 	return nil
 }
 

@@ -192,3 +192,19 @@ func (a *AdapterNodes) GenerateFedemeterRecommendationNodes (jeriType string, un
 	fedRecJeri.Resource = append(fedRecJeri.Resource, &fedRec)
 	return &fedRecJeri, nil
 }
+
+func (a *AdapterNodes) GenerateFedemeterCostRequest(clusterName string, category string, costType string, unit string)(*Fed.FedCostMetricReq, error) {
+	var fedCostReq Fed.FedCostMetricReq
+	var fedCostReqResource Fed.FedCostMetricResource
+	fedNodes, err := a.GenerateFedemeterCalculates(unit)
+	if err != nil {
+		return nil, err
+	}
+	fedCostReqResource.Nodesinfo = fedNodes.Calculator[0]
+	fedCostReqResource.Clustername = clusterName
+	fedCostReqResource.Category = category
+	fedCostReqResource.Type = costType
+
+	fedCostReq.Resource = append(fedCostReq.Resource, &fedCostReqResource)
+	return &fedCostReq, nil
+}

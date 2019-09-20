@@ -19,7 +19,7 @@ func init() {
 func TestDataHubClient_GetNodes(t *testing.T) {
 	dp := NewDataHubClient()
 	dp.Scope = logger
-	dp.SetDataPipeAddress("34.223.245.164:30923")
+	dp.SetDataPipeAddress("52.12.208.57:30050")
 	node, err := dp.GetNodes()
 	if err != nil {
 		t.Fatal(err)

@@ -224,3 +224,45 @@ type FedRecommendationJeriResp struct {
 	Total      int  `json:"total"`
 	Incomplete bool `json:"incomplete"`
 }
+
+type FedCostMetricResp struct {
+	Cluster struct {
+		Clustername string `json:"clustername"`
+		Provider    struct {
+			Providername string `json:"providername"`
+			Namespace    []struct {
+				Namespacename string `json:"namespacename"`
+				Costs         []struct {
+					Workloadcost   string `json:"workloadcost"`
+					Costpercentage string `json:"costpercentage"`
+					Timestampe     int64  `json:"timestampe"`
+				} `json:"costs"`
+				App []struct {
+					Appname string `json:"appname"`
+					Costs   []struct {
+						Workloadcost   string `json:"workloadcost"`
+						Costpercentage string `json:"costpercentage"`
+						Timestampe     int64  `json:"timestampe"`
+					} `json:"costs"`
+				} `json:"app"`
+			} `json:"namespace"`
+		} `json:"provider"`
+	} `json:"cluster"`
+	Count      int  `json:"count"`
+	Limit      int  `json:"limit"`
+	Page       int  `json:"page"`
+	Offset     int  `json:"offset"`
+	Total      int  `json:"total"`
+	Incomplete bool `json:"incomplete"`
+}
+
+type FedCostMetricResource struct {
+	Category    string `json:"category"`
+	Type        string `json:"type"`
+	Clustername string `json:"clustername"`
+	Nodesinfo   map[string][]*FedProvider `json:"nodesinfo"`
+}
+
+type FedCostMetricReq struct {
+	Resource [] *FedCostMetricResource `json:"resource"`
+}

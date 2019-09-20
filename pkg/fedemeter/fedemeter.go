@@ -7,11 +7,13 @@ import (
 	"io/ioutil"
 	"github.com/pkg/errors"
 	"net/http"
-
-	logUtil "github.com/containers-ai/alameda/pkg/utils/log"
 	"reflect"
 	"crypto/tls"
+	logUtil "github.com/containers-ai/alameda/pkg/utils/log"
+	"github.com/containers-ai/federatorai-agent/pkg/utils"
 	"time"
+	"context"
+	"math"
 )
 
 type jeriParameter struct {
@@ -20,6 +22,12 @@ type jeriParameter struct {
 	granularity     int64
 	fill_days       int
 	ri_calculator   bool
+}
+
+type costParameter struct {
+	tsfrom          int64
+	tsto            int64
+	granularity     int64
 }
 
 func NewFedermeter(apiUrl string, username string, password string, logger *logUtil.Scope) *Fedemeter {
@@ -75,6 +83,7 @@ func (f *Fedemeter) request(method string, url string, requestBody []byte, param
 			q.Add(refK.Field(i).Name, value)
 		}
 		request.URL.RawQuery = q.Encode()
+		f.logger.Infof("request: %s", request.URL.String())
 	}
 	client := &http.Client{Timeout: 120 * time.Second, Transport: tr}
 	resp, err := client.Do(request)
@@ -146,6 +155,68 @@ func (f *Fedemeter) GetRecommenderationJri(fedJriRequest *FedRecommendationJri) 
 	return &fedJriResp, nil
 }
 
+func (f *Fedemeter) GetCostHistorical(tsFrom int64, tsTo int64, granularity int64, fedCostReq *FedCostMetricReq) (*FedCostMetricResp, error) {
+	var fedCostResp FedCostMetricResp
+	reqBody, err := json.Marshal(fedCostReq)
+	if err != nil {
+		return nil, err
+	}
+	parms := &costParameter{tsfrom: tsFrom, tsto: tsTo, granularity: granularity}
+	res, err := f.request("PUT", fmt.Sprintf("%s/resources/historical/cost/", f.apiUrl), reqBody, parms)
+	if err != nil {
+		f.logger.Errorf("Failed to get historical cost, %v", err)
+		return nil, err
+	}
+	f.logger.Debugf("GetCostHistorical: %s", utils.InterfaceToString(string(res)))
+	err = json.Unmarshal(res, &fedCostResp)
+	if err != nil {
+		return nil, err
+	}
+	for _, n := range fedCostResp.Cluster.Provider.Namespace {
+		for i, c := range n.Costs {
+			n.Costs[i].Timestampe = int64(math.Floor(float64(c.Timestampe) / float64(granularity)))
+		}
+		for x, a := range n.App {
+			for i, c := range a.Costs {
+				n.App[x].Costs[i].Timestampe = int64(math.Floor(float64(c.Timestampe) / float64(granularity)))
+			}
+		}
+	}
+	f.logger.Debugf("CostHistorical: %s", utils.InterfaceToString(fedCostResp))
+	return &fedCostResp, nil
+}
+
+func (f *Fedemeter) GetCostPredicted(tsFrom int64, tsTo int64, granularity int64, fedCostReq *FedCostMetricReq) (*FedCostMetricResp, error) {
+	var fedCostResp FedCostMetricResp
+	reqBody, err := json.Marshal(fedCostReq)
+	if err != nil {
+		return nil, err
+	}
+	parms := &costParameter{tsfrom: tsFrom, tsto: tsTo, granularity: granularity}
+	res, err := f.request("PUT", fmt.Sprintf("%s/resources/predictions/cost/", f.apiUrl), reqBody, parms)
+	if err != nil {
+		f.logger.Errorf("Failed to get predicted cost, %v", err)
+		return nil, err
+	}
+	f.logger.Debugf("GetCostPredicted: %s", utils.InterfaceToString(string(res)))
+	err = json.Unmarshal(res, &fedCostResp)
+	if err != nil {
+		return nil, err
+	}
+	for _, n := range fedCostResp.Cluster.Provider.Namespace {
+		for i, c := range n.Costs {
+			n.Costs[i].Timestampe = int64(math.Floor(float64(c.Timestampe) / float64(granularity)))
+		}
+		for x, a := range n.App {
+			for i, c := range a.Costs {
+				n.App[x].Costs[i].Timestampe = int64(math.Floor(float64(c.Timestampe) / float64(granularity)))
+			}
+		}
+	}
+	f.logger.Debugf("CostPredicted: %s", utils.InterfaceToString(fedCostResp))
+	return &fedCostResp, nil
+}
+
 func (f *Fedemeter) GetRecommenderationJeri(tsFrom int64, tsTo int64, granularity int64, fillDays int, fedJeriRequest *FedRecommendationJeri, jeri bool) (*FedRecommendationJeriResp, error) {
 	var fedJriResp FedRecommendationJeriResp
 	reqBody, err := json.Marshal(fedJeriRequest)
@@ -160,6 +231,9 @@ func (f *Fedemeter) GetRecommenderationJeri(tsFrom int64, tsTo int64, granularit
 	}
 
 	err = json.Unmarshal(res, &fedJriResp)
+	if err != nil {
+		return nil, err
+	}
 	return &fedJriResp, nil
 }
 
@@ -172,8 +246,12 @@ func (f *Fedemeter) Calculate (fedProviders *FedProviders) (*FedCalculatorResp, 
 	res, err := f.request("PUT", fmt.Sprintf("%s/calculators/", f.apiUrl), reqBody, nil)
 	if err != nil {
 		f.logger.Errorf("Failed to calculate node cost with error %v", err)
+		return nil, err
 	}
 
 	err = json.Unmarshal(res, &fedCalculatorResp)
+	if err != nil {
+		return nil, err
+	}
 	return &fedCalculatorResp, nil
 }
