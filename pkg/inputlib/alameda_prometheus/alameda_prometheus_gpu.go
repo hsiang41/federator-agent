@@ -1,29 +1,29 @@
 package main
 
 import (
+	"io/ioutil"
+	"net"
+	"os"
 	"errors"
 	"encoding/json"
 	"fmt"
 	"strings"
+	"time"
 
 	"github.com/sheerun/queue"
 	"github.com/spf13/viper"
-	DataHubCommon "github.com/containers-ai/api/common"
 	v1alpha1 "github.com/containers-ai/api/alameda_api/v1alpha1/datahub"
+	DataHubCommon "github.com/containers-ai/api/common"
 	logUtil "github.com/containers-ai/alameda/pkg/utils/log"
 	"github.com/containers-ai/federatorai-agent/pkg/client/influx"
 	"github.com/containers-ai/federatorai-agent/pkg/influxConvert"
 	"github.com/containers-ai/federatorai-agent/pkg"
 	"github.com/containers-ai/federatorai-agent/pkg/utils"
+	"github.com/containers-ai/federatorai-agent/pkg/client/prometheus"
+	"github.com/containers-ai/federatorai-agent/pkg/influxConvert/prometheus"
 	"github.com/containers-ai/federatorai-agent/pkg/influxConvert/influx"
 	"github.com/containers-ai/federatorai-agent/pkg/datahub"
-	"github.com/containers-ai/federatorai-agent/pkg/influxConvert/prometheus"
-	"time"
-	"github.com/containers-ai/federatorai-agent/pkg/client/prometheus"
 	"github.com/google/uuid"
-	"os"
-	"net"
-	"io/ioutil"
 )
 
 var gCollector *collector
@@ -141,8 +141,8 @@ func (c *collector) HealthCheck() {
 
 func (c *collector) writeRawData (measurementName string, tags []string, fields *map[string]element, sourceData interface{}, convertType common.ConvertInt) error {
 	var iFields [] *common.InfluxField
-	for k, e := range (*fields) {
-		iField := common.InfluxField{k, FieldTypeMap[strings.ToLower(e.ElementType)], nil}
+	for k, e := range *fields {
+		iField := common.InfluxField{Name: k, Type: FieldTypeMap[strings.ToLower(e.ElementType)]}
 		iFields = append(iFields, &iField)
 	}
 	iConvert := InfluxConvert.NewInflux(c.Config.Target.Database, measurementName, tags, iFields, sourceData, convertType)
@@ -180,7 +180,7 @@ func (c *collector) Gather() error {
 			for _, m := range dv.Measurements {
 				var rawResponse influx.InfluxResp
 				expr := fmt.Sprintf("%s where time > now() - %ss order by time asc", m.Expr, m.LastSeconds)
-				//expr := fmt.Sprintf("%s order by time desc limit 10", m.Expr)
+				// expr := fmt.Sprintf("%s order by time desc limit 10", m.Expr)
 				c.Logger.Infof("expr: %s", expr)
 				dbClient := ClientInflux.NewClientInflux(dv.Address, dv.Database, ClientInflux.MethodQuery, expr)
 				result, err := dbClient.Execute()
