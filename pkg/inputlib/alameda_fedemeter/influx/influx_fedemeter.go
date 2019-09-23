@@ -509,8 +509,12 @@ func (n *InfluxMeasurement) generateCostNamespace(starttime *timestamp.Timestamp
 		for _, namespace := range p.Namespace {
 			for _, cost := range namespace.Costs {
 				namespacesName := namespace.Namespacename
+				costStr := cost.Costpercentage
+				if strings.Index(costStr, "%") > 0 {
+					costStr = cost.Costpercentage[:strings.Index(costStr, "%")]
+				}
 				workloadCost, _ := strconv.ParseFloat(cost.Workloadcost, 64)
-				costPercentage, _ := strconv.ParseFloat(cost.Costpercentage, 64)
+				costPercentage, _ := strconv.ParseFloat(costStr, 64)
 				costNamespace := &costNamespace{ClusterName: clusterName, Provider: provider, NamespaceName: namespacesName, WorkloadCost: workloadCost, CostPercentage: costPercentage, Time: cost.Timestampe * n.Granularity, Granularity: n.Granularity}
 				costNamespaces = append(costNamespaces, costNamespace)
 			}
@@ -615,9 +619,14 @@ func (n *InfluxMeasurement) generateCostApp(starttime *timestamp.Timestamp) (*v1
 			for _, app := range namespace.Apps {
 				appName := app.Appname
 				for _, cost := range app.Costs {
+					costStr := ""
 					namespacesName := namespace.Namespacename
 					workloadCost, _ := strconv.ParseFloat(cost.Workloadcost, 64)
-					costPercentage, _ := strconv.ParseFloat(cost.Costpercentage, 64)
+					costStr = cost.Costpercentage
+					if strings.Index(costStr, "%") > 0 {
+						costStr = cost.Costpercentage[:strings.Index(costStr, "%")]
+					}
+					costPercentage, _ := strconv.ParseFloat(costStr, 64)
 					costApp := &costApp{ClusterName: clusterName, Provider: provider, NamespaceName: namespacesName, WorkloadCost: workloadCost, CostPercentage: costPercentage, Time: cost.Timestampe * n.Granularity, AppName: appName, Granularity: n.Granularity}
 					costApps = append(costApps, costApp)
 				}
